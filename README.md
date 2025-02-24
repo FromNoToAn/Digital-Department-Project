@@ -100,12 +100,12 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 
   Клонируем репозиторий:
   ```
-  git clone RTK-Base-Detector
+  git clone Digital-Department-Project
   ```
 
   Переходим в папку репозитория:
   ```
-  cd RTK-Base-Detector
+  cd Digital-Department-Project
   ```
 
 ### 3. Установка зависимостей
