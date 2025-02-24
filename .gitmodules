@@ -1,0 +1,6 @@
+[submodule "SFSORT"]
+	path = SFSORT
+	url = https://github.com/Applied-Deep-Learning-Lab/SFSORT
+[submodule "boxmot"]
+	path = boxmot
+	url = https://github.com/Applied-Deep-Learning-Lab/boxmot
