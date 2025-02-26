@@ -110,7 +110,7 @@ class Detector(Base):
     ) -> tuple[np.ndarray, float, tuple[float, float]]:
         img = input_img.copy()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img, ratio, dwdh = self.letterbox(img, new_shape=(576,1024), auto=False)
+        img, ratio, dwdh = self.letterbox(img, new_shape=(1440,1440), auto=False)
         img = np.expand_dims(img, axis=0).astype("float32") / 255.0
         img = np.transpose(img, [0, 3, 1, 2])
 

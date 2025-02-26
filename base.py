@@ -189,7 +189,8 @@ class Base(ABC):
             )
             cv2.putText(
                 img=inf_img,
-                text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
+                text=f"LLL",
+                # text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
                 org=(int(det[0]) + 13, int(det[1]) - 13),
                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
                 fontScale=1.5,
@@ -304,8 +305,8 @@ class Base(ABC):
                                         x1,
                                         y1,
                                         int(track[1]),  # Track ID
-                                        int(track[2]),  # Class ID
-                                        float(track[3]),# Confidence
+                                        # int(track[2]),  # Class ID
+                                        # float(track[3]),# Confidence
                                     ]
                                 )
                     case "botsort":
@@ -396,7 +397,7 @@ class Base(ABC):
                     }
                 )
                 general_cfg.upload()
-                tracker.update_args(general_cfg["tracker_args_sfsort"])
+                # tracker.update_args(general_cfg["tracker_args_sfsort"])
 
     @staticmethod
     def _create_ffmpeg_processes(
@@ -563,7 +564,7 @@ class Base(ABC):
                 self.logger.warning("End of frames or broken frame!")
                 self.task_params[task_id].inference_status = StatusTask.ERROR
                 break
-            if len(properties["corners"]):
+            if "corners" in properties and len(properties["corners"]):
                 frame = self.draw_ROI(img=frame, corners=properties["corners"])
             # Get frame's timestamp
             current_timestamp = self.timestamps[task_id].get()
@@ -647,7 +648,7 @@ class Base(ABC):
         """
         match general_cfg["tracker"]:
             case "sfsort":
-                self.trackers[task_id] = SFSORT(general_cfg["tracker_args_sfsort"])
+                self.trackers[task_id] = SFSORT.SFSORT(general_cfg["tracker_args_sfsort"])
             case "botsort":
                 from boxmot import BotSort
                 self.trackers[task_id] = BotSort(
@@ -655,10 +656,14 @@ class Base(ABC):
                     **general_cfg["tracker_args_botsort"])
         
         self.timestamps[task_id] = queue.Queue()
-
+        
+        print("lol")
+        lol = StatusTask.RUNNING
+        print(task_id)
+        print("lol-")
+        self.task_params[task_id] = TaskParameters(host_ip="127.0.0.1")
         self.task_params[task_id].inference_status = StatusTask.RUNNING
         success = True
-
         # inferencing
         try:
             results = self._inference_cycle(video_url, task_id, properties)

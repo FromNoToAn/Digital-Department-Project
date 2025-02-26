@@ -1,0 +1,2 @@
+curl -X 'POST' 'http://127.0.0.1:8000/process_video?video_url=https://rutube.ru/video/dcef7da7c7c04a80d1296b7e85716bbd/?r=plwd&task_id=1'
+
