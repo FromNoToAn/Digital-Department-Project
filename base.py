@@ -189,7 +189,7 @@ class Base(ABC):
             )
             cv2.putText(
                 img=inf_img,
-                text=f"LLL",
+                text=f"{det[4]}",
                 # text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
                 org=(int(det[0]) + 13, int(det[1]) - 13),
                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
@@ -294,7 +294,7 @@ class Base(ABC):
 
                 match general_cfg["tracker"]:
                     case "sfsort":
-                        tracks = self.trackers[task_id].update(boxes, scores, classes)
+                        tracks = self.trackers[task_id].update(boxes, scores)
                         if len(tracks):
                             for track in tracks:
                                 x0, y0, x1, y1 = map(int, track[0])
@@ -348,7 +348,14 @@ class Base(ABC):
             An object containing video properties such as width, height, frame rate,
             frame interval, and duration.
         """
-        probe = ffmpeg.probe(video_url)
+        print(video_url)
+        try:
+            probe = ffmpeg.probe(video_url)
+            print(probe)
+        except ffmpeg.Error as e:
+            print("ffprobe stderr output:")
+            print(e.stderr.decode())  # Выводим stderr
+            raise RuntimeError(e.stderr.decode())
         video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
         fps = video_info["r_frame_rate"].split("/")
         fps = int(fps[0]) / int(fps[1])
