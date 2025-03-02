@@ -351,7 +351,7 @@ class Base(ABC):
         print(video_url)
         try:
             probe = ffmpeg.probe(video_url)
-            print(probe)
+            # print(probe)
         except ffmpeg.Error as e:
             print("ffprobe stderr output:")
             print(e.stderr.decode())  # Выводим stderr
@@ -664,10 +664,10 @@ class Base(ABC):
         
         self.timestamps[task_id] = queue.Queue()
         
-        print("lol")
+        # print("lol")
         lol = StatusTask.RUNNING
-        print(task_id)
-        print("lol-")
+        # print(task_id)
+        # print("lol-")
         self.task_params[task_id] = TaskParameters(host_ip="127.0.0.1")
         self.task_params[task_id].inference_status = StatusTask.RUNNING
         success = True
@@ -692,15 +692,23 @@ class Base(ABC):
             "results": results,
         }
 
-        response = requests.post(
-            f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/results/{task_id}",
-            json=response_content,
-            timeout=90,
-        )
+        try:
+            response = requests.post(
+                f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/results/{task_id}",
+                json=response_content,
+                timeout=30,
+            )
+        except requests.exceptions.ReadTimeout:
+            self.logger.error(f"Timeout for task {task_id}, skipping response.")
+            response = None
 
-        self.logger.info(
-            "Response from manager after complete task: %s", response.json()
-        )
+        if response is not None:
+            try:
+                self.logger.info("Response from manager after complete task: %s", response.json())
+            except Exception as e:
+                self.logger.error("Error while logging response: %s", str(e))
+            else:
+                self.logger.info(f"Task {task_id}: No response received.")
 
         self.task_params.pop(task_id)
         self.trackers.pop(task_id)
