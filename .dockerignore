@@ -1,3 +1,0 @@
-test/
-models/*.onnx
-!models/yolov8s_640.onnx
