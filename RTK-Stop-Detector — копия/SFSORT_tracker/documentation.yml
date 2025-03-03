@@ -1,0 +1,18 @@
+name: Generate Documentation
+
+on: [push]
+
+jobs:
+  generate_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install numpy
+        run: pip install numpy
+      - name: Install requirements
+        run: pip install pdoc3 lapx
+      - name: Generate documentation
+        run: pdoc --html SFSORT.py -o docs --force
+      - name: Rename generated page to index.html
+        run: mv ./docs/SFSORT.html ./docs/index.html

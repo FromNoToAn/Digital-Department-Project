@@ -1,0 +1,24 @@
+{
+    "manager_port": 5001,
+    "quality_post_image": 50,
+    "framerate": 10,
+    "working_time_sec": 30,
+    "tracker_args": {
+        "dynamic_tuning": true,
+        "cth": 0.7,
+        "high_th": 0.7,
+        "high_th_m": 0.1,
+        "match_th_first": 0.6,
+        "match_th_first_m": 0.05,
+        "match_th_second": 0.4,
+        "low_th": 0.2,
+        "new_track_th": 0.5,
+        "new_track_th_m": 0.1,
+        "marginal_timeout": 17.0,
+        "central_timeout": 25.0,
+        "horizontal_margin": 192,
+        "vertical_margin": 108,
+        "frame_width": 1920,
+        "frame_height": 1080
+    }
+}
