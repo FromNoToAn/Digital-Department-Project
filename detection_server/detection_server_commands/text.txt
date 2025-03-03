@@ -1,0 +1,6 @@
+sudo systemctl start nginx
+sudo systemctl restart nginx
+sudo systemctl status nginx
+
+uvicorn detection_server:app --host 127.0.0.1 --port 8000
+
