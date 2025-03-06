@@ -10,10 +10,14 @@ import os
 import queue
 import re
 import sys
+import time
+import json
+from collections import defaultdict
 import traceback
 from abc import ABC, abstractmethod
 from logging import Logger
 from subprocess import Popen, TimeoutExpired
+import threading
 from threading import Thread
 
 import cv2
@@ -36,6 +40,85 @@ class Base(ABC):
     """
     Core of the Base Detector.
     """
+    class YOLODataLogger:
+        def __init__(self, task_id):
+            self.active_objects = defaultdict(dict)
+            self.lock = threading.Lock()
+            self.start_time = time.time()
+            self.task_id = task_id
+            
+            # Запускаем периодическое обновление JSON
+            self.timer = threading.Timer(5.0, self.update_json)
+            self.timer.daemon = True
+            self.timer.start()
+
+        def _calculate_duration(self, obj_id):
+            """Вычисляет время пребывания объекта в кадре."""
+            return round(time.time() - self.active_objects[obj_id]['first_seen'], 2)
+
+        def process_detections(self, detections):
+            """
+            Обновляет информацию о текущих объектах в кадре.
+            Args:
+                detections (list): Список обнаружений в формате 
+                                [{"class": "", "bbox": [x,y,w,h]}, ...]
+            """
+            current_time = time.time()
+            current_ids = set()
+            
+            with self.lock:
+                # Генерируем уникальные ID на основе хеша параметров
+                for det in detections:
+                    obj_id = hash((det['class'], tuple(det['bbox'])))
+                    
+                    if obj_id not in self.active_objects:
+                        self.active_objects[obj_id] = {
+                            'class': det['class'],
+                            'bbox': det['bbox'],
+                            'first_seen': current_time,
+                            'last_seen': current_time
+                        }
+                    else:
+                        self.active_objects[obj_id]['last_seen'] = current_time
+                    current_ids.add(obj_id)
+                
+                # Удаляем объекты, которые больше не в кадре
+                expired_ids = [obj_id for obj_id in self.active_objects 
+                            if obj_id not in current_ids]
+                for obj_id in expired_ids:
+                    del self.active_objects[obj_id]
+
+        def generate_data(self):
+            """Формирует данные для сохранения в JSON."""
+            data = {
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "objects": []
+            }
+            
+            with self.lock:
+                for obj_id, obj in self.active_objects.items():
+                    data["objects"].append({
+                        "class": obj['class'],
+                        "bbox": obj['bbox'],
+                        "duration": self._calculate_duration(obj_id)
+                    })
+            
+            return data
+
+        def update_json(self):
+            """Обновляет JSON-файл с данными и перезапускает таймер."""
+            try:
+                data = self.generate_data()
+                with open('./json_logs/yolo_detections.json', "w") as f:
+                    json.dump(data, f, indent=4)
+            finally:
+                # Перезапускаем таймер
+                self.timer = threading.Timer(5.0, self.update_json)
+                self.timer.start()
+
+        def stop(self):
+            """Останавливает периодическое обновление."""
+            self.timer.cancel()
 
     def __init__(self):
         self.logger: Logger = create_logger(self.__class__.__name__)
@@ -50,6 +133,7 @@ class Base(ABC):
             self.task_params, self._perform_inference_async, self.logger
         )
         """The application object for communication with the video analytics manager."""
+        self.data_loggers = {}
 
     @abstractmethod
     def pre_process(
@@ -255,6 +339,7 @@ class Base(ABC):
                     timestamp = int(float(match.group(1)) * 1000)
             if timestamp not in self.timestamps[task_id].queue:
                 self.timestamps[task_id].put(timestamp)
+                
 
     def run(self, img: np.ndarray, task_id: int) -> list:
         """
@@ -585,6 +670,17 @@ class Base(ABC):
 
             # Get results
             result = self.run(frame, task_id)
+            converted_dets = []
+            for det in result:
+                bbox = det[0:4]
+                class_id = det[5] if len(det) > 5 else 'unknown'
+                converted_dets.append({
+                    'class': class_id,
+                    'bbox': bbox
+                })
+            #Передаем данные в логгер
+            if task_id in self.data_loggers:
+                self.data_loggers[task_id].process_detections(converted_dets)
             inf_img = self.draw_results(frame, result)
             if write_process is not None:
                 write_process.stdin.write(inf_img.astype(np.uint8).tobytes())
@@ -663,6 +759,8 @@ class Base(ABC):
                     **general_cfg["tracker_args_botsort"])
         
         self.timestamps[task_id] = queue.Queue()
+
+        self.data_loggers[task_id] = self.YOLODataLogger(task_id)
         
         # print("lol")
         lol = StatusTask.RUNNING
@@ -681,6 +779,8 @@ class Base(ABC):
             self.task_params[task_id].inference_status = StatusTask.ERROR
             results = {}
             success = False
+        finally:
+            self.data_loggers.pop(task_id, None)
 
         response_content = {
             "task_id": task_id,
