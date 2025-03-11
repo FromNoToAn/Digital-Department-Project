@@ -273,7 +273,7 @@ class Base(ABC):
             )
             cv2.putText(
                 img=inf_img,
-                text=f"{det[4]}",
+                text=f"{det[4]}, {det[5]}, {det[6]:.2f}",
                 # text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
                 org=(int(det[0]) + 13, int(det[1]) - 13),
                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
@@ -379,7 +379,7 @@ class Base(ABC):
 
                 match general_cfg["tracker"]:
                     case "sfsort":
-                        tracks = self.trackers[task_id].update(boxes, scores)
+                        tracks = self.trackers[task_id].update(boxes, scores, classes)
                         if len(tracks):
                             for track in tracks:
                                 x0, y0, x1, y1 = map(int, track[0])
@@ -390,8 +390,8 @@ class Base(ABC):
                                         x1,
                                         y1,
                                         int(track[1]),  # Track ID
-                                        # int(track[2]),  # Class ID
-                                        # float(track[3]),# Confidence
+                                        int(track[2]),  # Class ID
+                                        float(track[3]),# Confidence
                                     ]
                                 )
                     case "botsort":
@@ -649,6 +649,10 @@ class Base(ABC):
             target=self._get_timestamp, args=(read_process, task_id)
         )
         timestamp_thread.start()
+
+        fps_start_time = time.time()
+        fps_counter = 0
+
         self.logger.debug("frame_id\tframe_timestamp\tprogress")
         while self.task_params[task_id].inference_status == StatusTask.RUNNING:
             frame = self._get_frame(read_process, params.ffprobe_params)
@@ -672,9 +676,13 @@ class Base(ABC):
             result = self.run(frame, task_id)
             converted_dets = []
             for det in result:
-                bbox = det[0:4]
-                class_id = det[5] if len(det) > 5 else 'unknown'
+                bbox = det[0:3]
+                track_id = det[4]
+                class_id = det[5]
+                scores = det[6] if len(det) > 7 else 'unknown'
                 converted_dets.append({
+                    'track': track_id,
+                    'score': scores,
                     'class': class_id,
                     'bbox': bbox
                 })
@@ -682,6 +690,24 @@ class Base(ABC):
             if task_id in self.data_loggers:
                 self.data_loggers[task_id].process_detections(converted_dets)
             inf_img = self.draw_results(frame, result)
+             # Расчет и отображение FPS
+            fps_counter += 1
+            fps_end_time = time.time()
+            fps = fps_counter / (fps_end_time - fps_start_time)
+            cv2.putText(
+                inf_img,
+                f"FPS: {round(fps)}",
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                2
+            )
+
+            if fps_end_time - fps_start_time >= 1.0:
+                fps_counter = 0
+                fps_start_time = time.time()
+
             if write_process is not None:
                 write_process.stdin.write(inf_img.astype(np.uint8).tobytes())
             params.results[f"{current_timestamp}"] = result
@@ -715,6 +741,9 @@ class Base(ABC):
             read_process.wait(timeout=5)
         except TimeoutExpired:
             read_process.kill()
+
+        
+        
 
         if write_process is not None:
             try:

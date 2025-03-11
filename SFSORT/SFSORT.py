@@ -41,18 +41,22 @@ class TrackState:
 class Track:
     """Handles basic track attributes and operations"""
     
-    def __init__(self, bbox, frame_id, track_id):
+    def __init__(self, bbox, frame_id, track_id, classes, scores):
         """Track initialization"""                 
         self.track_id = track_id
         self.bbox = bbox 
-        self.state = TrackState.Active                      
+        self.state = TrackState.Active               
+        self.classes = classes
+        self.scores = scores       
         self.last_frame = frame_id
  
-    def update(self, box, frame_id):
+    def update(self, box, frame_id, classes, scores):
         """Updates a matched track"""      
         self.bbox = box
         self.state = TrackState.Active
-        self.last_frame = frame_id
+        self.last_frame = frame_id             
+        self.clas = classes
+        self.scores = scores      
     
 
 class SFSORT:
@@ -178,15 +182,18 @@ class SFSORT:
         high_score = scores > hth 
         if high_score.any():
             definite_boxes = boxes[high_score]
-            definite_scores = scores[high_score]  
+            definite_scores = scores[high_score] 
+            definite_classes = classes[high_score] 
             if track_pool:           
                 cost = self.calculate_cost(track_pool, definite_boxes) 
                 matches, unmatched_tracks, unmatched_detections = self.linear_assignment(cost, mth) 
                 # Update/Activate matched tracks
                 for track_idx, detection_idx in matches:
                     box = definite_boxes[detection_idx]
+                    scor = definite_scores[detection_idx]
+                    clas = definite_classes[detection_idx]
                     track = track_pool[track_idx]                   
-                    track.update(box, self.frame_no)
+                    track.update(box, self.frame_no,clas,scor)
                     next_active_tracks.append(track)
                     # Remove re-identified tracks from lost list
                     if track in self.lost_tracks:
@@ -195,7 +202,9 @@ class SFSORT:
                 for detection_idx in unmatched_detections:                   
                     if definite_scores[detection_idx] > nth:
                         box = definite_boxes[detection_idx]
-                        track = Track(box, self.frame_no, self.id_counter)
+                        scor = definite_scores[detection_idx]
+                        clas = definite_classes[detection_idx]
+                        track = Track(box, self.frame_no, self.id_counter,clas,scor)
                         next_active_tracks.append(track)
                         self.id_counter += 1                   
             else:
@@ -203,7 +212,9 @@ class SFSORT:
                 for detection_idx, score in enumerate(definite_scores):                   
                     if score > nth:
                         box = definite_boxes[detection_idx]
-                        track = Track(box, self.frame_no, self.id_counter)
+                        scor = definite_scores[detection_idx]
+                        clas = definite_classes[detection_idx]
+                        track = Track(box, self.frame_no, self.id_counter,clas,scor)
                         next_active_tracks.append(track)
                         self.id_counter += 1  
         
@@ -218,13 +229,17 @@ class SFSORT:
         if intermediate_score.any(): 
             if len(unmatched_tracks):                 
                 possible_boxes = boxes[intermediate_score]
+                possible_scores = scores[intermediate_score]
+                possible_classes = classes[intermediate_score]
                 cost = self.calculate_cost(unmatched_track_pool, possible_boxes, iou_only=True)
                 matches, unmatched_tracks, unmatched_detections = self.linear_assignment(cost, self.match_th_second)
                 # Update/Activate matched tracks
                 for track_idx, detection_idx in matches:
                     box = possible_boxes[detection_idx]
+                    scor = possible_scores[detection_idx]
+                    clas = possible_classes[detection_idx]
                     track = unmatched_track_pool[track_idx]                  
-                    track.update(box, self.frame_no)
+                    track.update(box, self.frame_no,clas,scor)
                     next_active_tracks.append(track)
                     # Remove re-identified tracks from lost list 
                     if track in self.lost_tracks:
@@ -249,7 +264,7 @@ class SFSORT:
         # Update the list of active tracks
         self.active_tracks = next_active_tracks.copy()
 
-        return np.asarray([[x.bbox, x.track_id] for x in next_active_tracks], dtype=object)
+        return np.asarray([[x.bbox, x.track_id, x.classes, x.scores] for x in next_active_tracks], dtype=object)
 
     @staticmethod
     def clamp(value, min_value, max_value):

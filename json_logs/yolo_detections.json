@@ -1,475 +1,428 @@
 {
-    "timestamp": "2025-03-06 16:58:34",
+    "timestamp": "2025-03-11 10:53:16",
     "objects": [
         {
-            "class": "unknown",
+            "class": 0,
             "bbox": [
                 550,
                 -43,
-                590,
-                90
+                590
             ],
-            "duration": 114.13
+            "duration": 76.61
         },
         {
-            "class": "unknown",
-            "bbox": [
-                359,
-                106,
-                412,
-                283
-            ],
-            "duration": 113.37
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                640,
-                758,
-                709,
-                1009
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                447,
-                75,
-                514,
-                267
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1589,
-                636,
-                1665,
-                879
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                450,
-                301,
-                521,
-                510
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                285,
-                127,
-                337,
-                297
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                703,
-                0,
-                750,
-                151
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
+            "class": 0,
             "bbox": [
                 1721,
                 455,
-                1797,
-                667
+                1797
             ],
-            "duration": 112.63
+            "duration": 75.95
         },
         {
-            "class": "unknown",
+            "class": 0,
             "bbox": [
-                797,
-                150,
-                855,
-                322
+                359,
+                106,
+                412
             ],
-            "duration": 112.63
+            "duration": 75.95
         },
         {
-            "class": "unknown",
-            "bbox": [
-                1433,
-                -46,
-                1485,
-                88
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                954,
-                34,
-                1014,
-                211
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                586,
-                565,
-                673,
-                808
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1016,
-                52,
-                1069,
-                213
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                341,
-                535,
-                428,
-                780
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                209,
-                301,
-                262,
-                485
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                924,
-                -15,
-                980,
-                143
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                215,
-                134,
-                270,
-                297
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                970,
-                910,
-                1060,
-                1186
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                110,
-                348,
-                159,
-                535
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                319,
-                56,
-                378,
-                221
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                828,
-                -47,
-                879,
-                111
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                541,
-                60,
-                590,
-                230
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                849,
-                493,
-                934,
-                721
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                708,
-                90,
-                764,
-                259
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                226,
-                107,
-                278,
-                286
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                205,
-                102,
-                247,
-                273
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                349,
-                91,
-                398,
-                267
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                425,
-                74,
-                476,
-                250
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                452,
-                556,
-                521,
-                787
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                64,
-                320,
-                141,
-                524
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                914,
-                507,
-                979,
-                716
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1772,
-                102,
-                1829,
-                264
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                507,
-                83,
-                557,
-                255
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                469,
-                1016,
-                556,
-                1142
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                258,
-                78,
-                312,
-                252
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                535,
-                967,
-                638,
-                1185
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1796,
-                446,
-                1860,
-                659
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1095,
-                450,
-                1154,
-                651
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1634,
-                16,
-                1696,
-                178
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                757,
-                101,
-                805,
-                238
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                1357,
-                -64,
-                1414,
-                70
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                384,
-                -43,
-                425,
-                94
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
-            "bbox": [
-                427,
-                -49,
-                472,
-                91
-            ],
-            "duration": 112.63
-        },
-        {
-            "class": "unknown",
+            "class": 0,
             "bbox": [
                 1219,
                 38,
-                1284,
-                126
+                1284
             ],
-            "duration": 112.63
+            "duration": 75.95
         },
         {
-            "class": "unknown",
+            "class": 0,
+            "bbox": [
+                640,
+                758,
+                709
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                447,
+                75,
+                514
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1589,
+                636,
+                1665
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                450,
+                301,
+                521
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                285,
+                127,
+                337
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                703,
+                0,
+                750
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                797,
+                150,
+                855
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1433,
+                -46,
+                1485
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                954,
+                34,
+                1014
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                586,
+                565,
+                673
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1016,
+                52,
+                1069
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                341,
+                535,
+                428
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                209,
+                301,
+                262
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                924,
+                -15,
+                980
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                215,
+                134,
+                270
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                970,
+                910,
+                1060
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                110,
+                348,
+                159
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                319,
+                56,
+                378
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                828,
+                -47,
+                879
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                541,
+                60,
+                590
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                849,
+                493,
+                934
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                708,
+                90,
+                764
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                226,
+                107,
+                278
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                205,
+                102,
+                247
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                349,
+                91,
+                398
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                425,
+                74,
+                476
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                452,
+                556,
+                521
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                64,
+                320,
+                141
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                914,
+                507,
+                979
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1772,
+                102,
+                1829
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                507,
+                83,
+                557
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                469,
+                1016,
+                556
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                258,
+                78,
+                312
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                535,
+                967,
+                638
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1796,
+                446,
+                1860
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1095,
+                450,
+                1154
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1634,
+                16,
+                1696
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                757,
+                101,
+                805
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                1357,
+                -64,
+                1414
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                384,
+                -43,
+                425
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
+            "bbox": [
+                427,
+                -49,
+                472
+            ],
+            "duration": 75.32
+        },
+        {
+            "class": 0,
             "bbox": [
                 1560,
                 -68,
-                1606,
-                68
+                1606
             ],
-            "duration": 112.63
+            "duration": 75.32
         },
         {
-            "class": "unknown",
+            "class": 0,
             "bbox": [
                 1804,
                 67,
-                1869,
-                231
+                1869
             ],
-            "duration": 112.63
+            "duration": 75.32
         }
     ]
 }
