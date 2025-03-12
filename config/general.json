@@ -1,7 +1,7 @@
 {
     "manager_port": 8000,
     "quality_post_image": 50,
-    "framerate": 10,
+    "framerate": 20,
     "working_time_sec": 30,
     "tracker": "sfsort",
     "tracker_args_sfsort": {
@@ -15,8 +15,8 @@
         "match_th_first_m": 0.05,
         "match_th_second": 0.4,
         "new_track_th_m": 0.2,
-        "marginal_timeout": 21.0,
-        "central_timeout": 30.0,
+        "marginal_timeout": 35.0,
+        "central_timeout": 50.0,
         "horizontal_margin": 192,
         "vertical_margin": 108,
         "frame_width": 1920,

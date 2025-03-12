@@ -21,5 +21,5 @@ class BaseDetector(Detector):
 if __name__ == "__main__":
     # Пример использования BaseDetector с путем к модели
     # detector = BaseDetector("./models/yolov8s_576x1024.onnx")
-    detector = BaseDetector("./models/best.onnx")
+    detector = BaseDetector("./models/yolov8s.onnx")
     uvicorn.run(detector.app, host="127.0.0.1", port=8000)
