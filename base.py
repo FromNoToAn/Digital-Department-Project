@@ -820,6 +820,7 @@ class Base(ABC):
             "tsLastFrame": self.task_params[task_id].ts_last_processed,
             "results": results,
         }
+        print(response_content["success"])
 
         try:
             response = requests.post(
@@ -836,8 +837,6 @@ class Base(ABC):
                 self.logger.info("Response from manager after complete task: %s", response.json())
             except Exception as e:
                 self.logger.error("Error while logging response: %s", str(e))
-            else:
-                self.logger.info(f"Task {task_id}: No response received.")
 
         self.task_params.pop(task_id)
         self.trackers.pop(task_id)
