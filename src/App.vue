@@ -10,15 +10,20 @@
 </template>
 
 <style>
-#app {
+
+#app
+{
   max-width: 600px;
   margin: auto;
   text-align: center;
   font-family: Arial, sans-serif;
 }
-h1 {
+
+h1
+{
   font-size: 24px;
   margin-bottom: 20px;
 }
+
 </style>
 

@@ -21,6 +21,8 @@ const uploadVideo = async () => {
       body: formData,
     });
 
+    console.log("Статус ответа:", response.status);
+
     if (!response.ok) throw new Error("Ошибка загрузки видео");
 
     const data = await response.json();
