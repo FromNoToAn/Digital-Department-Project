@@ -38,29 +38,80 @@ const uploadVideo = async () => {
 
 <template>
   <div class="uploader">
-    <input type="file" accept="video/mp4" @change="handleFileChange" />
-    <button @click="uploadVideo" :disabled="!selectedFile">Загрузить видео</button>
-    <p v-if="status">{{ status }}</p>
+    <div class="file_input">
+      <label for="fileInput" class="select_button">Выбрать<br/>видео</label>
+      <input class="select_input" id="fileInput" type="file" accept="video/mp4" @change="handleFileChange" hidden/>
+      <p class="select_file" v-if="selectedFile">{{ selectedFile.name }}</p>
+    </div>
+    <div class="file_send">
+      <button class="send_button" @click="uploadVideo" :disabled="!selectedFile">Загрузить видео</button>
+      <p class="select_file" v-if="status">{{ status }}</p>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.uploader {
+<style scoped lang="scss">
+@use '../../src/styles/main.scss' as global;
+
+.uploader
+{
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(var(--mini-margin));
+}
+
+.file_input,
+.file_send
+{
+  position: relative;
+  display: flex;
+  flex-direction: row;
   align-items: center;
 }
-button {
-  padding: 10px;
+
+.select_button
+{
+  @include global.button(var(--color-black));
+  background-color: var(--color-dark);
   cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
 }
-button:disabled {
-  background-color: #ddd;
+
+.select_file
+{
+  position: relative;
+  display: flex;
+  padding: calc(var(--mini-margin) / 4);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: var(--font-muller-medium);
+  font-size: var(--font-size);
+}
+
+.send_button
+{
+  @include global.button(var(--color-green));
+  border: none;
+  color: var(--color-white);
+  background-color: var(--color-lime);
+  cursor: pointer;
+}
+
+.send_button:disabled
+{
+  display: none;
   cursor: not-allowed;
 }
+
+// button
+// {
+//   padding: 10px;
+//   cursor: pointer;
+//   background-color: #4CAF50;
+//   color: white;
+//   border: none;
+//   border-radius: 5px;
+// }
 </style>

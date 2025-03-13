@@ -1,0 +1,201 @@
+
+@font-face
+{
+	font-family: muller_bold;
+	src: url(../fonts/MullerBold.woff2);
+}
+@font-face
+{
+	font-family: muller_medium;
+	src: url(../fonts/MullerMedium.woff2);
+}
+@font-face
+{
+	font-family: muller_regular;
+	src: url(../fonts/MullerRegular.woff2);
+}
+
+
+:root
+{
+  font-family: muller_medium;
+  color-scheme: light dark;
+  color: var(--color-dark);
+  background-color: var(--color-light);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --index: calc(1vw + 1vh);
+
+  --mini-margin: calc(var(--index) * 1.5);
+
+  --border-size: calc(var(--index) / 4);
+  --border-radius: calc(var(--index) * 1.25);
+
+  --font-muller-bold: 'muller_bold';
+  --font-muller-medium: 'muller_medium';
+  --font-muller-regular: 'muller_regular';
+  
+  --font-big-size: calc((var(--index) * 0.9 - 0.25vh) * 3);
+  --font-mid-size: calc((var(--index) * 0.9 - 0.25vh) * 1.75);
+  --font-size: calc((var(--index) * 0.9 - 0.1vh) * 1.1);
+  --font-mini-size: calc((var(--index) * 0.9 - 0.1vh) / 1.25);
+
+  --color-dark: rgb(40, 40, 40);
+  --color-light: rgb(225, 226, 227);
+
+  --color-black: black;
+  --color-gray: gray;
+  --color-white: white;
+
+  --color-lime: rgb(90, 200, 110);
+  --color-green: rgb(120, 230, 140);
+}
+
+
+@mixin button($select_color)
+{
+  font-family: var(--font-muller-medium);
+  font-size: var(--font-size);
+  text-align: center;
+  width: min(100%, calc(var(--mini-margin) * 3.75));
+  padding: calc(var(--mini-margin) / 4);
+  border-radius: calc(var(--border-radius) / 4);
+  transition: 0.25s ease-in-out;
+
+  &:hover
+  {
+    background-color: $select_color;
+  }
+}
+
+.main-gradient
+{
+	color: transparent;   
+	-webkit-background-clip: text;
+	background-clip: text;
+	background-image: linear-gradient(to right, var(--color-white), var(--color-lime));
+}
+
+*
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  caret-color: transparent;
+  // outline: #535bf2 solid;
+}
+
+#app
+{
+  font-family: muller_medium;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100svh;
+  gap: calc(var(--mini-margin))
+  // min-height: 100svh;
+}
+
+.header
+{
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--mini-margin);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  border: var(--border-size) solid var(--color-lime);
+  border-width: 0 0 var(--border-size) 0;
+  color: var(--color-white);
+  background-color: var(--color-dark);
+
+  > .text
+  {
+    font-family: var(--font-muller-bold);
+    font-size: var(--font-big-size);
+    text-transform: uppercase;
+  }
+}
+
+.section
+{
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 var(--mini-margin);
+
+  > .section_container
+  {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: calc(var(--mini-margin) / 2);
+    padding: var(--mini-margin);
+    border: var(--border-size) solid var(--color-lime);
+    border-width: 0 var(--border-size) var(--border-size) 0;
+    border-radius: var(--border-radius);
+    color: var(--color-white);
+    background-color: var(--color-white);
+
+    > .section_header
+    {
+      font-family: var(--font-muller-bold);
+      font-size: var(--font-mid-size);
+      text-transform: uppercase;
+      align-self: self-start;
+      padding: calc(var(--mini-margin) / 3);
+      border-radius: calc(var(--border-radius) / 2);
+      background-color: var(--color-dark);
+    }
+
+    > .section_text
+    {
+      position: relative;
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      justify-content: center;
+      padding: calc(var(--mini-margin) / 1.5) calc(var(--mini-margin) * 2);
+      border-radius: calc(var(--border-radius) / 2);
+      background-color: var(--color-gray);
+    }
+  }
+}
+
+
+
+
+
+// button {
+//   border-radius: 8px;
+//   border: 1px solid transparent;
+//   padding: 0.6em 1.2em;
+//   font-size: 1em;
+//   font-weight: 500;
+//   font-family: inherit;
+//   background-color: #1a1a1a;
+//   cursor: pointer;
+//   transition: border-color 0.25s;
+// }
+// button:hover {
+//   border-color: #646cff;
+// }
+// button:focus,
+// button:focus-visible {
+//   outline: 4px auto -webkit-focus-ring-color;
+// }
+
+// .card {
+//   padding: 2em;
+// }
