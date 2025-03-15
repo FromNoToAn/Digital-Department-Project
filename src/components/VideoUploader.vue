@@ -3,6 +3,13 @@ import { ref } from "vue";
 
 const selectedFile = ref(null);
 const status = ref("");
+const video_url = ref("");
+const preview_url = ref("");
+const site = ref("http://127.0.0.1:8000");
+
+const load_flag = ref(true);
+
+let checkInterval = null;
 
 const handleFileChange = (event) => {
   selectedFile.value = event.target.files[0];
@@ -16,7 +23,7 @@ const uploadVideo = async () => {
 
   try
   {
-    const response = await fetch("http://127.0.0.1:8000/upload", {
+    const response = await fetch(`${site.value}/upload`, {
       method: "POST",
       body: formData,
     });
@@ -27,11 +34,52 @@ const uploadVideo = async () => {
 
     const data = await response.json();
     status.value = `Видео загружено. task_id: ${data.task_id}`;
+
+    preview_url.value = `${site.value}/task/status/${data.task_id}`;
+    video_url.value = `${site.value}/${data.video_url}`;
+
+    checkInterval = setInterval(() => checkVideoStatus(data.task_id), 3000);
+
+    console.log(preview_url.value);
+    console.log(video_url.value);
   }
   catch (error)
   {
     console.error("Ошибка:", error);
     status.value = "Ошибка при загрузке видео";
+  }
+};
+
+const checkVideoStatus = async (task_id) => {
+  try
+  {
+    const response = await fetch(`${site.value}/task/status/${task_id}`, { method: "GET" });
+    load_flag.value = false;
+
+    if (response.ok)
+    {
+      const data = await response.json();
+      
+      // Проверяем поле success в ответе
+      if (data.success)
+      {
+        clearInterval(checkInterval);
+        preview_url.value = "";
+        video_url.value = `${site.value}/videos/${task_id}.mp4`;
+      }
+      else
+      {
+        console.log("Видео еще не готово...");
+      }
+    }
+    else
+    {
+      console.error("Ошибка запроса к серверу...");
+    }
+  }
+  catch (error)
+  {
+    console.error("Ошибка при проверке статуса видео:", error);
   }
 };
 </script>
@@ -47,6 +95,13 @@ const uploadVideo = async () => {
       <button class="send_button" @click="uploadVideo" :disabled="!selectedFile">Загрузить видео</button>
       <p class="select_file" v-if="status">{{ status }}</p>
     </div>
+
+    <img v-if="preview_url" :src="video_url" width="30" height="25"/>
+
+    <video v-if="!load_flag && !preview_url" width="200" controls>
+      <source :src="video_url" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
   </div>
 </template>
 
