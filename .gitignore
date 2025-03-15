@@ -172,3 +172,8 @@ test/
 # *.mp4
 *.jpg
 *.png
+
+
+# my gitignore
+uploads/
+videos/

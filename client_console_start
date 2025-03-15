@@ -1,0 +1,6 @@
+Windows
+curl.exe -X 'POST' 'http://127.0.0.1:8000/process_video?video_url=Sample.mp4&task_id=1'
+
+Linux
+curl -X 'POST' 'http://127.0.0.1:8000/process_video?video_url=Sample.mp4&task_id=1'
+curl -X 'POST' 'http://127.0.0.1:8000/process_video?video_url=sample3.mp4&task_id=1'
