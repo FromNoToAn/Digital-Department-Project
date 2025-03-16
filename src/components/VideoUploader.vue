@@ -85,24 +85,41 @@ const checkVideoStatus = async (task_id) => {
 </script>
 
 <template>
-  <div class="uploader">
-    <div class="file_input">
-      <label for="fileInput" class="select_button">Выбрать<br/>видео</label>
-      <input class="select_input" id="fileInput" type="file" accept="video/mp4" @change="handleFileChange" hidden/>
-      <p class="select_file" v-if="selectedFile">{{ selectedFile.name }}</p>
+  <section class="section upload_section">
+    <div class="section_container">
+      <div class="section_header">
+        <div class="text">Загрузка видео на сервер</div>
+      </div>
+      <div class="section_text">
+        <div class="uploader">
+          <div class="file_input">
+            <label for="fileInput" class="select_button">Выбрать<br/>видео</label>
+            <input class="select_input" id="fileInput" type="file" accept="video/mp4" @change="handleFileChange" hidden/>
+            <p class="select_file" v-if="selectedFile">{{ selectedFile.name }}</p>
+          </div>
+          <div class="file_send">
+            <button class="send_button" @click="uploadVideo" :disabled="!selectedFile">Загрузить видео</button>
+            <p class="select_file" v-if="status">{{ status }}</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="file_send">
-      <button class="send_button" @click="uploadVideo" :disabled="!selectedFile">Загрузить видео</button>
-      <p class="select_file" v-if="status">{{ status }}</p>
+  </section>
+  <section v-if="status && (preview_url || video_url)" class="section upload_section">
+    <div class="section_container">
+      <div class="section_header">
+        <div class="text">Обработанное видео</div>
+      </div>
+      <div class="section_text for_video">
+        <img class="section_img" v-if="preview_url" :src="video_url"/>
+
+        <video class="section_video" v-if="!load_flag && !preview_url" width="200" controls>
+          <source :src="video_url" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </div>
-
-    <img v-if="preview_url" :src="video_url" width="30" height="25"/>
-
-    <video v-if="!load_flag && !preview_url" width="200" controls>
-      <source :src="video_url" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
+  </section>
 </template>
 
 <style scoped lang="scss">
@@ -159,14 +176,4 @@ const checkVideoStatus = async (task_id) => {
   display: none;
   cursor: not-allowed;
 }
-
-// button
-// {
-//   padding: 10px;
-//   cursor: pointer;
-//   background-color: #4CAF50;
-//   color: white;
-//   border: none;
-//   border-radius: 5px;
-// }
 </style>
