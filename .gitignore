@@ -177,3 +177,5 @@ test/
 # my gitignore
 uploads/
 videos/
+results/
+logs/

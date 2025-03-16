@@ -1,7 +1,8 @@
+import os
+import sys
 import cv2
 import numpy as np
 import uvicorn
-import os
 import shutil
 import json
 
@@ -21,7 +22,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 os.makedirs(VIDEOS_DIR, exist_ok=True)
 
-PLACEHOLDER_IMAGE = f"{VIDEOS_DIR}/no_img.jpg"
+PLACEHOLDER_IMAGE = "examples/no_img.jpg"
 
 class BaseDetector(Detector):
     def __init__(self, model_path: str):
@@ -45,6 +46,7 @@ class BaseDetector(Detector):
         self.app.add_api_route("/task/status/{task_id}", self.get_task_status, methods=["GET"])
         
         self.app.mount("/videos", StaticFiles(directory=VIDEOS_DIR), name="videos")
+        self.app.mount("/examples", StaticFiles(directory="examples"), name="examples")
 
     def get_free_task_id(self) -> int:
         """

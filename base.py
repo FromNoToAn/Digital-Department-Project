@@ -5,7 +5,6 @@ It also has a method for getting frames and time from a video stream,
 processing them and saving the results. It also has methods for other detectors
 that should be redefined for processing by a specific detector.
 """
-
 import os
 import queue
 import re
@@ -743,8 +742,6 @@ class Base(ABC):
             read_process.kill()
 
         
-        
-
         if write_process is not None:
             try:
                 write_process.stdin.close()
