@@ -43,7 +43,7 @@ class Base(ABC):
         def __init__(self, task_id):
             self.active_objects = defaultdict(dict)
             self.lock = threading.Lock()
-            self.start_time = time.time()
+            self.time = 0
             self.task_id = task_id
             
             # Запускаем периодическое обновление JSON
@@ -53,7 +53,8 @@ class Base(ABC):
 
         def _calculate_duration(self, obj_id):
             """Вычисляет время пребывания объекта в кадре."""
-            return round(time.time() - self.active_objects[obj_id]['first_seen'], 2)
+            self.time += 1/general_cfg["framerate"]
+            return self.time
 
         def process_detections(self, detections):
             """
@@ -68,14 +69,15 @@ class Base(ABC):
             with self.lock:
                 # Генерируем уникальные ID на основе хеша параметров
                 for det in detections:
-                    obj_id = hash((det['class'], tuple(det['bbox'])))
+                    obj_id = hash((det['class'], tuple(det['bbox']), det['time']))
                     
                     if obj_id not in self.active_objects:
                         self.active_objects[obj_id] = {
                             'class': det['class'],
                             'bbox': det['bbox'],
                             'first_seen': current_time,
-                            'last_seen': current_time
+                            'last_seen': current_time,
+                            'time': det['time']
                         }
                     else:
                         self.active_objects[obj_id]['last_seen'] = current_time
@@ -99,21 +101,21 @@ class Base(ABC):
                     data["objects"].append({
                         "class": obj['class'],
                         "bbox": obj['bbox'],
-                        "duration": self._calculate_duration(obj_id)
+                        "duration": obj['time']
                     })
             
             return data
 
         def update_json(self):
             """Обновляет JSON-файл с данными и перезапускает таймер."""
-            try:
-                data = self.generate_data()
-                with open('./json_logs/yolo_detections.json', "w") as f:
-                    json.dump(data, f, indent=4)
-            finally:
-                # Перезапускаем таймер
-                self.timer = threading.Timer(5.0, self.update_json)
-                self.timer.start()
+            # try:
+            data = self.generate_data()
+            with open('./json_logs/yolo_detections.json', "w") as f:
+                json.dump(data, f, indent=4)
+            # finally:
+            #     # Перезапускаем таймер
+            #     self.timer = threading.Timer(5.0, self.update_json)
+            #     self.timer.start()
 
         def stop(self):
             """Останавливает периодическое обновление."""
@@ -674,17 +676,21 @@ class Base(ABC):
 
             # Get results
             result = self.run(frame, task_id)
+            self.data_loggers[task_id].update_json()
             converted_dets = []
             for det in result:
                 bbox = det[0:3]
                 track_id = det[4]
                 class_id = det[5]
-                scores = det[6] if len(det) > 7 else 'unknown'
+                scores = det[6] 
+                duration = det[7]
+                # print(len(det))
                 converted_dets.append({
                     'track': track_id,
                     'score': scores,
                     'class': class_id,
-                    'bbox': bbox
+                    'bbox': bbox,
+                    'time': duration
                 })
             #Передаем данные в логгер
             if task_id in self.data_loggers:
