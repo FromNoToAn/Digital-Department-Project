@@ -170,8 +170,8 @@ test/
 
 # Media
 # *.mp4
-*.jpg
-*.png
+# *.jpg
+# *.png
 
 
 # my gitignore
