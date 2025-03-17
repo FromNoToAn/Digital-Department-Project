@@ -1,14 +1,14 @@
 {
-    "timestamp": "2025-03-16 17:34:12",
+    "timestamp": "2025-03-17 11:07:35",
     "objects": [
         {
-            "class": 17,
+            "class": 11,
             "bbox": [
                 932,
                 686,
                 1437
             ],
-            "duration": 2460.89
+            "duration": 192.6
         }
     ]
 }
