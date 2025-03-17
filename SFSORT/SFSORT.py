@@ -14,6 +14,7 @@
 import numpy as np
 
 
+from config import general_cfg
 use_lap=True
 try:
     import lap
@@ -49,6 +50,7 @@ class Track:
         self.classes = classes
         self.scores = scores       
         self.last_frame = frame_id
+        self.time = 0
  
     def update(self, box, frame_id, classes, scores):
         """Updates a matched track"""      
@@ -56,7 +58,8 @@ class Track:
         self.state = TrackState.Active
         self.last_frame = frame_id             
         self.clas = classes
-        self.scores = scores      
+        self.scores = scores  
+        self.time += 1/general_cfg["framerate"] 
     
 
 class SFSORT:
@@ -183,7 +186,7 @@ class SFSORT:
         if high_score.any():
             definite_boxes = boxes[high_score]
             definite_scores = scores[high_score] 
-            definite_classes = classes[high_score] 
+            definite_classes = classes[high_score]
             if track_pool:           
                 cost = self.calculate_cost(track_pool, definite_boxes) 
                 matches, unmatched_tracks, unmatched_detections = self.linear_assignment(cost, mth) 
@@ -264,7 +267,7 @@ class SFSORT:
         # Update the list of active tracks
         self.active_tracks = next_active_tracks.copy()
 
-        return np.asarray([[x.bbox, x.track_id, x.classes, x.scores] for x in next_active_tracks], dtype=object)
+        return np.asarray([[x.bbox, x.track_id, x.classes, x.scores, x.time] for x in next_active_tracks], dtype=object)
 
     @staticmethod
     def clamp(value, min_value, max_value):

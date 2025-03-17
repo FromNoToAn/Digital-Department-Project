@@ -272,7 +272,7 @@ class Base(ABC):
             )
             cv2.putText(
                 img=inf_img,
-                text=f"{det[4]}, {det[5]}, {det[6]:.2f}",
+                text=f"{det[4]}, {det[5]}, {det[6]:.2f}, {det[7]:.2f}",
                 # text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
                 org=(int(det[0]) + 13, int(det[1]) - 13),
                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
@@ -391,6 +391,7 @@ class Base(ABC):
                                         int(track[1]),  # Track ID
                                         int(track[2]),  # Class ID
                                         float(track[3]),# Confidence
+                                        float(track[4]), #Time
                                     ]
                                 )
                     case "botsort":
