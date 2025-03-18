@@ -35,6 +35,8 @@ from utils.dataclasses import StatusTask, TaskParameters
 from utils.validate import validate_unix_timestamp
 
 
+list_of_animals = ["Медведь","Птица","Кот","Олень","Собака","Обезьяна","Тигр","Кабан"]
+
 class Base(ABC):
     """
     Core of the Base Detector.
@@ -274,7 +276,7 @@ class Base(ABC):
             )
             cv2.putText(
                 img=inf_img,
-                text=f"{det[4]}, {det[5]}, {det[6]:.2f}, {det[7]:.2f}",
+                text=f"{det[4]}, {list_of_animals[det[5]]}, {det[6]:.2f}, {det[7]:.2f}",
                 # text=f"({det[4]}){det[5]} - {round(det[6], 2)}",
                 org=(int(det[0]) + 13, int(det[1]) - 13),
                 fontFace=cv2.FONT_HERSHEY_COMPLEX,
