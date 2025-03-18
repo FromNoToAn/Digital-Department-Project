@@ -3,6 +3,7 @@ import { ref } from "vue";
 
 const selectedFile = ref(null);
 const status = ref("");
+const progress = ref(0);
 const video_url = ref("");
 const preview_url = ref("");
 const site = ref("http://127.0.0.1:8000");
@@ -38,7 +39,7 @@ const uploadVideo = async () => {
     preview_url.value = `${site.value}/task/status/${data.task_id}`;
     video_url.value = `${site.value}/${data.video_url}`;
 
-    checkInterval = setInterval(() => checkVideoStatus(data.task_id), 3000);
+    checkInterval = setInterval(() => checkVideoStatus(data.task_id), 2000);
 
     console.log(preview_url.value);
     console.log(video_url.value);
@@ -59,6 +60,10 @@ const checkVideoStatus = async (task_id) => {
     if (response.ok)
     {
       const data = await response.json();
+      if(data.progress)
+      {
+        progress.value = data.progress;
+      }
       
       // Проверяем поле success в ответе
       if (data.success)
@@ -105,13 +110,19 @@ const checkVideoStatus = async (task_id) => {
       </div>
     </div>
   </section>
-  <section v-if="status && (preview_url || video_url)" class="section upload_section">
+  <section v-if="status && (preview_url || video_url) || 1" class="section upload_section">
     <div class="section_container">
       <div class="section_header">
         <div class="text">Обработанное видео</div>
       </div>
       <div class="section_text for_video">
         <img class="section_img" v-if="preview_url" :src="video_url"/>
+        <div class="section_progress" v-if="preview_url" :src="video_url">
+          <div class="progress_bar-container">
+            <div class="progress_bar"></div>
+          </div>
+          <div class="progress_prersentage">{{ (progress* 100).toFixed(2) }}%</div>
+        </div>
 
         <video class="section_video" v-if="!load_flag && !preview_url" width="200" controls>
           <source :src="video_url" type="video/mp4" />
