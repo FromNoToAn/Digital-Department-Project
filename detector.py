@@ -27,7 +27,7 @@ class Detector(Base):
 
     CONF_TH = 0.6
     """The confidence threshold for the results of the onnx model."""
-    IOU_TH = 0.7
+    IOU_TH = 0.3
     """The threshold of intersection over union for the results of the onnx model."""
 
     def __init__(self, model_path: str):

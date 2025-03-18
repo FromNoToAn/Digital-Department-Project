@@ -51,6 +51,7 @@ class Track:
         self.scores = scores       
         self.last_frame = frame_id
         self.time = 0
+        self.trail = []
  
     def update(self, box, frame_id, classes, scores):
         """Updates a matched track"""      
@@ -60,6 +61,11 @@ class Track:
         self.clas = classes
         self.scores = scores  
         self.time += 1/general_cfg["framerate"] 
+        x_center = int((box[0] + box[2]) / 2)
+        y_center = int((box[1] + box[3]) / 2)
+        self.trail.append([x_center,y_center])
+        if len(self.trail)> general_cfg["trail_length"]:
+            self.trail.pop(0)
     
 
 class SFSORT:
@@ -267,7 +273,7 @@ class SFSORT:
         # Update the list of active tracks
         self.active_tracks = next_active_tracks.copy()
 
-        return np.asarray([[x.bbox, x.track_id, x.classes, x.scores, x.time] for x in next_active_tracks], dtype=object)
+        return np.asarray([[x.bbox, x.track_id, x.classes, x.scores, x.time, x.trail] for x in next_active_tracks], dtype=object)
 
     @staticmethod
     def clamp(value, min_value, max_value):

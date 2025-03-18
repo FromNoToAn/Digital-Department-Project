@@ -274,6 +274,8 @@ class Base(ABC):
                 color=(235, 215, 50),
                 thickness=3,
             )
+            for i in range(1, len(det[8])):
+                cv2.line(inf_img, det[8][i - 1], det[8][i], (0, 255, 0), 2)
             cv2.putText(
                 img=inf_img,
                 text=f"{det[4]}, {list_of_animals[det[5]]}, {det[6]:.2f}, {det[7]:.2f}",
@@ -396,6 +398,7 @@ class Base(ABC):
                                         int(track[2]),  # Class ID
                                         float(track[3]),# Confidence
                                         float(track[4]), #Time
+                                        track[5],
                                     ]
                                 )
                     case "botsort":
@@ -718,7 +721,7 @@ class Base(ABC):
 
             if write_process is not None:
                 write_process.stdin.write(inf_img.astype(np.uint8).tobytes())
-            params.results[f"{current_timestamp}"] = result
+            params.results[f"{current_timestamp}"] = result[:-1]
 
             # Sending data to the sending queue
             if params.is_realtime:
@@ -726,7 +729,7 @@ class Base(ABC):
                     "fps": params.ffprobe_params.fps,
                     "duration": params.ffprobe_params.duration,
                     "timestamp": current_timestamp,
-                    "result": result,
+                    "result": result[:-1],
                 }
                 session.put(cv2.cvtColor(inf_img, cv2.COLOR_BGR2RGB), data_frame)
 
@@ -782,7 +785,6 @@ class Base(ABC):
         if session.is_alive():
             session.join()
         results = {"results": params.results}
-
         return results
 
     def _perform_inference_async(
@@ -834,7 +836,6 @@ class Base(ABC):
             success = False
         finally:
             self.data_loggers.pop(task_id, None)
-
         response_content = {
             "task_id": task_id,
             "state": self.task_params[task_id].inference_status,
@@ -844,6 +845,7 @@ class Base(ABC):
             "tsLastFrame": self.task_params[task_id].ts_last_processed,
             "results": results,
         }
+        # print(results)
         print(response_content["success"])
 
         try:
@@ -855,7 +857,6 @@ class Base(ABC):
         except requests.exceptions.ReadTimeout:
             self.logger.error(f"Timeout for task {task_id}, skipping response.")
             response = None
-
         if response is not None:
             try:
                 self.logger.info("Response from manager after complete task: %s", response.json())
