@@ -738,6 +738,24 @@ class Base(ABC):
                 self.task_params[task_id].progress,
             )
             self.task_params[task_id].ts_last_processed = current_timestamp
+            
+            # try:
+            #     success = False
+            #     response_content = {
+            #         "task_id": task_id,
+            #         "state": self.task_params[task_id].inference_status,
+            #         "success": success,
+            #         "framesProcessed": self.task_params[task_id].frame_processed,
+            #         "progress": self.task_params[task_id].progress,
+            #         "tsLastFrame": self.task_params[task_id].ts_last_processed,
+            #     }
+            #     response = requests.post(
+            #         f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/results/{task_id}",
+            #         json=response_content,
+            #         timeout=30,
+            #     )
+            # except Exception as e:
+            #     self.logger.error(f"Except in inference: {e}")
 
         self.task_params[task_id].progress = max(self.task_params[task_id].progress, 1)
 

@@ -92,12 +92,16 @@ class BaseDetector(Detector):
         """
         status_file_path = os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")
         
+        now_progress = 0.00
+        if self.task_params:
+            now_progress = self.task_params[task_id].progress
+        
         if os.path.exists(status_file_path):
             with open(status_file_path, "r") as status_file:
                 status = json.load(status_file)
             return JSONResponse(content=status)
         else:
-            return JSONResponse(content={"task_id": task_id, "success": False, "message": "Task not ready yet"})
+            return JSONResponse(content={"task_id": task_id, "success": False, "progress": now_progress, "message": "Task not ready yet"})
         
     
 
