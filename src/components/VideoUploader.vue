@@ -176,7 +176,7 @@ const checkVideoStatus = async (task_id) => {
 
 .send_button
 {
-  @include global.button(var(--color-green));
+  @include global.button(var(--color-light_lime));
   border: none;
   color: var(--color-white);
   background-color: var(--color-lime);
