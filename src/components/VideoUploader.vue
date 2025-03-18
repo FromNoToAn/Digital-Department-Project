@@ -39,7 +39,7 @@ const uploadVideo = async () => {
     preview_url.value = `${site.value}/task/status/${data.task_id}`;
     video_url.value = `${site.value}/${data.video_url}`;
 
-    checkInterval = setInterval(() => checkVideoStatus(data.task_id), 2000);
+    checkInterval = setInterval(() => checkVideoStatus(data.task_id), 1500);
 
     console.log(preview_url.value);
     console.log(video_url.value);
@@ -110,24 +110,25 @@ const checkVideoStatus = async (task_id) => {
       </div>
     </div>
   </section>
-  <section v-if="status && (preview_url || video_url) || 1" class="section upload_section">
+  <section v-if="status && (preview_url || video_url)" class="section upload_section">
     <div class="section_container">
       <div class="section_header">
         <div class="text">Обработанное видео</div>
       </div>
       <div class="section_text for_video">
-        <img class="section_img" v-if="preview_url" :src="video_url"/>
         <div class="section_progress" v-if="preview_url" :src="video_url">
           <div class="progress_bar-container">
-            <div class="progress_bar"></div>
+            <div class="progress_bar" :style="{ width: progress * 100 + '%' }"></div>
           </div>
           <div class="progress_prersentage">{{ (progress* 100).toFixed(2) }}%</div>
         </div>
 
-        <video class="section_video" v-if="!load_flag && !preview_url" width="200" controls>
-          <source :src="video_url" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <div class="section_video" v-if="!load_flag && !preview_url">
+          <video class="result_video" controls>
+            <source :src="video_url" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
     </div>
   </section>
