@@ -25,7 +25,7 @@ class Detector(Base):
         Filename or serialized ONNX or ORT format model in a byte string.
     """
 
-    CONF_TH = 0.7
+    CONF_TH = 0.6
     """The confidence threshold for the results of the onnx model."""
     IOU_TH = 0.7
     """The threshold of intersection over union for the results of the onnx model."""
