@@ -1,7 +1,7 @@
 {
     "manager_port": 8000,
     "quality_post_image": 50,
-    "framerate": 10,
+    "framerate": 30,
     "working_time_sec": 30,
     "tracker": "sfsort",
     "trail_length": 100,
@@ -16,12 +16,12 @@
         "match_th_first_m": 0.05,
         "match_th_second": 0.4,
         "new_track_th_m": 0.2,
-        "marginal_timeout": 35.0,
-        "central_timeout": 50.0,
-        "horizontal_margin": 192,
-        "vertical_margin": 108,
-        "frame_width": 1920,
-        "frame_height": 1080
+        "marginal_timeout": 20.0,
+        "central_timeout": 29.97002997002997,
+        "horizontal_margin": 128,
+        "vertical_margin": 72,
+        "frame_width": 1280,
+        "frame_height": 720
     },
     "tracker_args_botsort": {
         "track_high_thresh": 0.3,
