@@ -4,6 +4,7 @@
 
 <template>
   <header class="header">
+    <img class="picture" src="/images/animals.svg" alt="Logo">
     <div class="text">Animal <span class="main-gradient">Detection</span></div>
   </header>
   <section class="sections">

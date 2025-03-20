@@ -104,9 +104,10 @@
 {
   display: flex;
   width: 100%;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: var(--mini-margin);
   padding: var(--mini-margin);
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   border: var(--border-size) solid var(--color-lime);
@@ -114,11 +115,24 @@
   color: var(--color-white);
   background-color: var(--color-dark);
 
+  > .picture
+  {
+    position: relative;
+    width: calc(var(--font-big-size) * 1.5);
+  }
+
   > .text
   {
+    display: inline-block;
     font-family: var(--font-muller-bold);
     font-size: var(--font-big-size);
     text-transform: uppercase;
+    text-align: center;
+
+    > span
+    {
+      display: inline-block;
+    }
   }
 }
 
