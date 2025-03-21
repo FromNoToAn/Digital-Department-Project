@@ -401,27 +401,6 @@ class Base(ABC):
                                         track[5],
                                     ]
                                 )
-                    case "botsort":
-                        tracks = self.trackers[task_id].update(
-                            np.hstack((boxes,
-                                       scores.reshape(-1,1),
-                                       classes.reshape(-1,1))),
-                            img
-                            )
-                        if len(tracks):
-                            for track in tracks:
-                                x0, y0, x1, y1 = map(int, track[0:4])
-                                dets.append(
-                                    [
-                                        x0,
-                                        y0,
-                                        x1,
-                                        y1,
-                                        int(track[4]),  # Track ID
-                                        int(track[6]),  # Class ID
-                                        float(track[5]),# Confidence
-                                    ]
-                                )
         return dets
 
     @staticmethod
@@ -789,11 +768,6 @@ class Base(ABC):
         match general_cfg["tracker"]:
             case "sfsort":
                 self.trackers[task_id] = SFSORT.SFSORT(general_cfg["tracker_args_sfsort"])
-            case "botsort":
-                from boxmot import BotSort
-                self.trackers[task_id] = BotSort(
-                    frame_rate=general_cfg["framerate"],
-                    **general_cfg["tracker_args_botsort"])
         
         self.timestamps[task_id] = queue.Queue()
 

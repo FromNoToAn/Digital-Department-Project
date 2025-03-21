@@ -5,6 +5,7 @@ import numpy as np
 import uvicorn
 import shutil
 import json
+import aiohttp
 
 from fastapi import UploadFile, File, BackgroundTasks
 from fastapi.responses import JSONResponse
@@ -16,16 +17,10 @@ from detector import Detector
 
 from config import general_cfg
 
-
-UPLOAD_DIR = "uploads"
 RESULTS_DIR = "results"
 VIDEOS_DIR = "videos"
 
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(RESULTS_DIR, exist_ok=True)
 os.makedirs(VIDEOS_DIR, exist_ok=True)
-
-PLACEHOLDER_IMAGE = "examples/no_img.jpg"
 
 class BaseDetector(Detector):
     def __init__(self, model_path: str):
@@ -39,81 +34,156 @@ class BaseDetector(Detector):
             allow_headers=["*"],
         )
         
+        self.app.add_api_route("/upload_video", self.upload_video, methods=["POST"])
         
-        self.app.add_api_route("/process_video", self.process_video, methods=["POST"])
-        self.app.add_api_route("/upload", self.upload_video, methods=["POST"])
-        self.app.add_api_route("/task/stream/{task_id}", self.stream_task, methods=["POST"])
+        self.app.add_api_route("/task/status/{task_id}", self.get_status_task, methods=["GET"])
+        self.app.add_api_route("/task/status/{task_id}", self.delete_status_task, methods=["DELETE"])
+        
+        self.app.add_api_route("/task/results/{task_id}", self.results_task, methods=["POST"])
+        
+        self.app.add_api_route("/task/stream/{task_id}", self.get_stream_task, methods=["GET"])
         self.app.add_api_route("/task/data/{task_id}", self.task_data, methods=["POST"])
-        self.app.add_api_route("/task/results/{task_id}", self.task_results, methods=["POST"])
-        
-        self.app.add_api_route("/task/status/{task_id}", self.get_task_status, methods=["GET"])
         
         self.app.mount("/videos", StaticFiles(directory=VIDEOS_DIR), name="videos")
-        self.app.mount("/examples", StaticFiles(directory="examples"), name="examples")
+
 
     def get_free_task_id(self) -> int:
         """
         Возвращает минимальный незанятый task_id.
         """
+        os.makedirs(RESULTS_DIR, exist_ok=True)
+        
         task_id = 1
         while task_id in self.task_params or os.path.exists(os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")):
             task_id += 1
         return task_id
 
-    async def process_video(self, video_url: str, task_id: int):
-        """
-        Запускает обработку видео через API.
-        """
-        self.logger.info(f"Received request to process video: {video_url}")
-        self._perform_inference_async(video_url, task_id)
-        return {"message": "Video processing started", "task_id": task_id}
 
     async def upload_video(self, video: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()):
         """
-        Получает загруженный файл, сохраняет его и передает на обработку.
+        Принимает видео и отправляет его на эндпоинт обработки без сохранения на диск.
         """
-        video_path = os.path.join(UPLOAD_DIR, video.filename)
-        with open(video_path, "wb") as buffer:
-            shutil.copyfileobj(video.file, buffer)
-
         task_id = self.get_free_task_id()
         
-        # Добавляем обработку в фон
+        properties = {
+        "isRealtime": "true",
+        "cornerUp": 0,
+        "cornerLeft": 0,
+        "cornerBottom": 1080,
+        "cornerRight": 1920
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            form_data = aiohttp.FormData()
+            form_data.add_field("file", video.file, filename=video.filename, content_type=video.content_type)
+            form_data.add_field("properties", json.dumps(properties), content_type="application/json")
+            
+            response = await session.post(f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}", data=form_data)
 
-        # Добавляем обработку в фон
-        background_tasks.add_task(self._perform_inference_async, video_path, task_id)
+            if response.status != 200:
+                return JSONResponse(content={"message": "Error sending video", "status": response.status}, status_code=500)
 
         return JSONResponse(content={
-            "message": "Video uploaded and processing started",
-            "task_id": task_id,
-            "video_url": PLACEHOLDER_IMAGE
+            "message": "Video uploaded and sent for processing",
+            "task_id": task_id
         })
-        
-    async def get_task_status(self, task_id: int):
+
+
+    async def get_status_task(self, task_id: int):
         """
-        Возвращает текущий статус задачи по ее task_id.
+        Возвращает текущий статус задачи, запрашивая его через GET-запрос.
+        Всегда запрашивает актуальную информацию, не используя хранилище.
         """
-        status_file_path = os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")
+        # Выполняем GET-запрос к API, чтобы получить актуальный статус
+        async with aiohttp.ClientSession() as session:
+            try:
+                url = f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}"
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        status = await response.json()
+                        return JSONResponse(content=status)
+                    else:
+                        # Если GET-запрос не вернул статус, проверяем файл с результатами
+                        status_file_path = os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")
+                        
+                        if os.path.exists(status_file_path):
+                            with open(status_file_path, "r") as status_file:
+                                status = json.load(status_file)
+                            return JSONResponse(content=status)
+                        else:
+                            # Если и файл не найден, возвращаем ошибку
+                            return JSONResponse(content={
+                                "task_id": task_id,
+                                "success": False,
+                                "message": f"Task {task_id} not found or error occurred (Status code: {response.status})"
+                            }, status_code=404)
+
+            except Exception as e:
+                return JSONResponse(content={
+                    "task_id": task_id,
+                    "success": False,
+                    "message": f"Error occurred: {str(e)}"
+                }, status_code=500)
+                
+    async def delete_status_task(self, task_id: int):
+        """
+        Инициирует удаление самой задачи через API.
+        """
+        # Удалим саму задачу, отправив запрос на /api/inference/{task_id} с методом DELETE
+        async with aiohttp.ClientSession() as session:
+            try:
+                url = f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}"
+                async with session.delete(url) as response:
+                    if response.status == 200:
+                        return JSONResponse(content={
+                            "task_id": task_id,
+                            "message": "Task status and task deleted successfully"
+                        })
+                    else:
+                        # Если удаление задачи через API не удалось, возвращаем сообщение об ошибке
+                        return JSONResponse(content={
+                            "task_id": task_id,
+                            "message": f"Task deletion failed with status code {response.status}"
+                        }, status_code=response.status)
+
+            except Exception as e:
+                # В случае ошибки при отправке запроса на удаление задачи через API
+                return JSONResponse(content={
+                    "task_id": task_id,
+                    "message": f"Error occurred while trying to delete task: {str(e)}"
+                }, status_code=500)
         
-        now_progress = 0.00
-        if self.task_params:
-            now_progress = self.task_params[task_id].progress
+    # async def status_task(self, task_id: int):
+    #     """
+    #     Возвращает текущий статус задачи по ее task_id.
+    #     """
         
-        if os.path.exists(status_file_path):
-            with open(status_file_path, "r") as status_file:
-                status = json.load(status_file)
-            return JSONResponse(content=status)
-        else:
-            return JSONResponse(content={"task_id": task_id, "success": False, "progress": now_progress, "message": "Task not ready yet"})
+    #     status_file_path = os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")
+        
+    #     now_progress = 0.00
+    #     if self.task_params:
+    #         now_progress = self.task_params[task_id].progress
+        
+    #     if os.path.exists(status_file_path):
+    #         with open(status_file_path, "r") as status_file:
+    #             status = json.load(status_file)
+    #         return JSONResponse(content=status)
+    #     else:
+    #         return JSONResponse(content={"task_id": task_id, "success": False, "progress": now_progress, "message": "Task not ready yet"})
         
     
 
-    async def stream_task(self, task_id: int, stream_data: dict):
-        """
-        Обрабатывает поток данных для заданного task_id.
-        """
-        self.logger.info(f"Received stream data for task_id {task_id}: {stream_data}")
-        return {"message": "Stream data processed", "task_id": task_id, "stream_info": stream_data}
+    async def get_stream_task(self, task_id: int):
+        url = f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/task/stream/{task_id}"
+        
+        # Используем aiohttp для асинхронного получения потока
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    frame = await response.read()  # Получаем кадр
+                    return frame
+                else:
+                    raise HTTPException(status_code=response.status, detail="Failed to get task stream")
 
     async def task_data(self, task_id: int, task_data: dict):
         """
@@ -122,7 +192,7 @@ class BaseDetector(Detector):
         self.logger.info(f"Received task data for task_id {task_id}: {task_data}")
         return {"message": "Task data processed", "task_id": task_id, "data": task_data}
 
-    async def task_results(self, task_id: int, results: dict):
+    async def results_task(self, task_id: int, results: dict):
         """
         Принимает результаты выполнения задачи для заданного task_id и сохраняет их.
         """
