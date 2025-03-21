@@ -443,14 +443,14 @@ class Base(ABC):
         print(video_url)
         try:
             probe = ffmpeg.probe(video_url)
-            # print(probe)
         except ffmpeg.Error as e:
             print("ffprobe stderr output:")
-            print(e.stderr.decode())  # Выводим stderr
+            print(e.stderr.decode())
             raise RuntimeError(e.stderr.decode())
         video_info = next(s for s in probe["streams"] if s["codec_type"] == "video")
         fps = video_info["r_frame_rate"].split("/")
         fps = int(fps[0]) / int(fps[1])
+        
         duration = (
             float(video_info["duration"])
             if "duration" in video_info
@@ -743,24 +743,6 @@ class Base(ABC):
                 self.task_params[task_id].progress,
             )
             self.task_params[task_id].ts_last_processed = current_timestamp
-            
-            # try:
-            #     success = False
-            #     response_content = {
-            #         "task_id": task_id,
-            #         "state": self.task_params[task_id].inference_status,
-            #         "success": success,
-            #         "framesProcessed": self.task_params[task_id].frame_processed,
-            #         "progress": self.task_params[task_id].progress,
-            #         "tsLastFrame": self.task_params[task_id].ts_last_processed,
-            #     }
-            #     response = requests.post(
-            #         f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/results/{task_id}",
-            #         json=response_content,
-            #         timeout=30,
-            #     )
-            # except Exception as e:
-            #     self.logger.error(f"Except in inference: {e}")
 
         self.task_params[task_id].progress = max(self.task_params[task_id].progress, 1)
 
@@ -821,7 +803,7 @@ class Base(ABC):
         lol = StatusTask.RUNNING
         # print(task_id)
         # print("lol-")
-        self.task_params[task_id] = TaskParameters(host_ip="127.0.0.1")
+        self.task_params[task_id] = TaskParameters(host_ip=general_cfg['manager_host'])
         self.task_params[task_id].inference_status = StatusTask.RUNNING
         success = True
         # inferencing

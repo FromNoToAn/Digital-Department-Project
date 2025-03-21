@@ -14,6 +14,9 @@ from fastapi import HTTPException
 
 from detector import Detector
 
+from config import general_cfg
+
+
 UPLOAD_DIR = "uploads"
 RESULTS_DIR = "results"
 VIDEOS_DIR = "videos"
@@ -136,6 +139,6 @@ class BaseDetector(Detector):
         return {"message": "Task results saved", "task_id": task_id, "results_path": result_file_path}
 
 if __name__ == "__main__":
-    # Пример использования BaseDetector с путем к модели
+    
     detector = BaseDetector("./models/best.onnx")
-    uvicorn.run(detector.app, host="127.0.0.1", port=8000)
+    uvicorn.run(detector.app, host=general_cfg["manager_host"], port=general_cfg["manager_port"])
