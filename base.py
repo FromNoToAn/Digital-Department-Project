@@ -774,13 +774,10 @@ class Base(ABC):
 
         self.data_loggers[task_id] = self.YOLODataLogger(task_id)
         
-        # print("lol")
-        lol = StatusTask.RUNNING
-        # print(task_id)
-        # print("lol-")
         self.task_params[task_id] = TaskParameters(host_ip=general_cfg['manager_host'])
         self.task_params[task_id].inference_status = StatusTask.RUNNING
         success = True
+        
         # inferencing
         try:
             results = self._inference_cycle(video_url, task_id, properties)

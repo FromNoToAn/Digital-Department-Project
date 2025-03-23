@@ -86,7 +86,7 @@ def create_router(
             data = await request.form()
             properties = json.loads(data["properties"])
             properties = get_properties(data=properties)
-            print(properties)
+            # print(properties)
 
             # Prepare for save video results
             video_dir = os.path.join(os.path.abspath(os.path.curdir), "uploaded_videos")

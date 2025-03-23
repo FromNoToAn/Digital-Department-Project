@@ -1,4 +1,5 @@
 import os
+import glob
 import sys
 import cv2
 import numpy as np
@@ -7,7 +8,7 @@ import shutil
 import json
 import aiohttp
 
-from fastapi import UploadFile, File, Query
+from fastapi import UploadFile, File, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +21,6 @@ from config import general_cfg
 RESULTS_DIR = "results"
 VIDEOS_DIR = "videos"
 
-os.makedirs(VIDEOS_DIR, exist_ok=True)
 
 class BaseDetector(Detector):
     def __init__(self, model_path: str):
@@ -33,6 +33,15 @@ class BaseDetector(Detector):
             allow_methods=["*"],
             allow_headers=["*"],
         )
+        
+        os.makedirs(VIDEOS_DIR, exist_ok=True)
+        
+        for file in glob.glob(os.path.join(RESULTS_DIR, "task_*_data.json")):
+            os.remove(file)
+
+        # Удаляем все PNG-файлы в videos/
+        for file in glob.glob(os.path.join(VIDEOS_DIR, "*.jpg")):
+            os.remove(file)
         
         self.app.add_api_route("/upload_video", self.upload_video, methods=["POST"])
         
@@ -56,13 +65,15 @@ class BaseDetector(Detector):
         """
         os.makedirs(RESULTS_DIR, exist_ok=True)
         
+        # Удаляем файлы task_X_data.json в results/
+        
         task_id = 1
         while task_id in self.task_params or os.path.exists(os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")):
             task_id += 1
         return task_id
 
 
-    async def upload_video(self, video: UploadFile = File(...), is_realtime: bool = Query(False)):
+    async def upload_video(self, video: UploadFile = File(...), is_realtime: bool = Form(False)):
         """
         Принимает видео и отправляет его на эндпоинт обработки без сохранения на диск.
         """
@@ -70,11 +81,13 @@ class BaseDetector(Detector):
         
         properties = {
         "isRealtime": str(is_realtime),
-        "cornerUp": 0,
-        "cornerLeft": 0,
-        "cornerBottom": 1080,
-        "cornerRight": 1920
+        # "cornerUp": 0,
+        # "cornerLeft": 0,
+        # "cornerBottom": 1080,
+        # "cornerRight": 1920
         }
+        
+        self.logger.info(f"is_realtime: {is_realtime}")
         
         async with aiohttp.ClientSession() as session:
             form_data = aiohttp.FormData()
@@ -106,6 +119,7 @@ class BaseDetector(Detector):
                 async with session.get(url) as response:
                     if response.status == 200:
                         status = await response.json()
+                        status["mp4"] = False
                         return JSONResponse(content=status)
                     else:
                         # Если GET-запрос не вернул статус, проверяем файл с результатами
@@ -114,12 +128,14 @@ class BaseDetector(Detector):
                         if os.path.exists(status_file_path):
                             with open(status_file_path, "r") as status_file:
                                 status = json.load(status_file)
+                            status["mp4"] = True
                             return JSONResponse(content=status)
                         else:
                             # Если и файл не найден, возвращаем ошибку
                             return JSONResponse(content={
                                 "task_id": task_id,
                                 "success": False,
+                                "mp4": False,
                                 "message": f"Task {task_id} not found or error occurred (Status code: {response.status})"
                             }, status_code=404)
 
@@ -166,16 +182,17 @@ class BaseDetector(Detector):
         return {"message": f"Image received for task {task_id}", "file_path": file_path}
 
     async def get_stream_task(self, task_id: int):
-        file_path = f"{VIDEOS_DIR}/{task_id}.jpg"
-    
-        # Проверяем, существует ли файл
-        if os.path.exists(file_path):
-            # Если файл существует, формируем URL на файл
-            file_url = f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/{file_path}"
-            return JSONResponse(content={"message": "File found", "file_url": file_url})
+        
+        img_path = f"{VIDEOS_DIR}/{task_id}.jpg"
+        video_path = os.path.join(RESULTS_DIR, f"task_{task_id}_results.json")
+        
+        if os.path.exists(video_path):
+            return JSONResponse(content={"stream": False, "message": "Stream has ended"})
+        elif not os.path.exists(img_path):
+            return JSONResponse(content={"stream": True, "message": "Stream file not found"})
         else:
-            # Если файл не найден, возвращаем ошибку
-            raise HTTPException(status_code=404, detail="File not found")
+            file_url = f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/{img_path}"
+            return JSONResponse(content={"stream": True, "message": "Stream file found", "file_url": file_url})
         
     async def data_task(self, task_id: int, task_data: dict):
         """
@@ -221,6 +238,15 @@ class BaseDetector(Detector):
         # Сохраняем результаты в файл
         with open(result_file_path, "w") as result_file:
             json.dump(results, result_file)
+            
+        img_path = f"{VIDEOS_DIR}/{task_id}.jpg"
+        data_path = os.path.join(RESULTS_DIR, f"task_{task_id}_data.json")
+        
+        if os.path.exists(img_path):
+            os.remove(img_path)
+            
+        if os.path.exists(data_path):
+            os.remove(data_path)
         
         # Добавляем информацию о сохранении
         return {"message": "Task results saved", "task_id": task_id, "results_path": result_file_path}
