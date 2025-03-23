@@ -175,7 +175,7 @@ test/
 
 
 # my gitignore
-uploads/
+uploaded_videos/
 videos/
 results/
 logs/
