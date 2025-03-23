@@ -9,3 +9,6 @@ curl -X POST "http://localhost:8000/upload_video" -F "video=@C:/[MAIN]/Пред�
 curl -X GET "http://localhost:8000/task/status/1"
 
 curl -X DELETE "http://localhost:8000/task/status/1"
+
+
+curl -X POST "http://localhost:8000/upload_video" -F "video=@examples/sample3.mp4"

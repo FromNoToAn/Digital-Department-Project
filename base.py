@@ -627,6 +627,7 @@ class Base(ABC):
             url_data=f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/data/{task_id}",
             logger=self.logger,
         )
+        
         # Start session
         if params.is_realtime:
             session.start()

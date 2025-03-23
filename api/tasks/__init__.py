@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 from logging import Logger
 from typing import Any, Callable, Optional
 
@@ -83,7 +84,9 @@ def create_router(
         if file:
             # Input and processing properties
             data = await request.form()
-            properties = get_properties(data=data)
+            properties = json.loads(data["properties"])
+            properties = get_properties(data=properties)
+            print(properties)
 
             # Prepare for save video results
             video_dir = os.path.join(os.path.abspath(os.path.curdir), "uploaded_videos")
