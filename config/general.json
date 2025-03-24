@@ -19,19 +19,9 @@
         "new_track_th_m": 0.2,
         "marginal_timeout": 20.0,
         "central_timeout": 29.97002997002997,
-        "horizontal_margin": 128,
-        "vertical_margin": 72,
-        "frame_width": 1280,
-        "frame_height": 720
-    },
-    "tracker_args_botsort": {
-        "track_high_thresh": 0.3,
-        "match_thresh": 0.8,
-        "track_low_thresh": 0.1,
-        "new_track_thresh": 0.3,
-        "fuse_first_associate": false,
-        "per_class": true,
-        "with_reid": false,
-        "cmc_method": "sof"
+        "horizontal_margin": 76,
+        "vertical_margin": 43,
+        "frame_width": 768,
+        "frame_height": 432
     }
 }
