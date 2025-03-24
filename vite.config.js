@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      "/upload": "http://127.0.0.1:8000",  // Прокси запросов на сервер FastAPI
+      "/upload_video": process.env.VITE_API_BASE_URL,  // Прокси запросов на сервер FastAPI
     },
   },
 })
