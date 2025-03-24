@@ -178,25 +178,35 @@ class RequestPostData(BackgroundThread):
         async with aiohttp.ClientSession() as session:
             while not self.queue.empty():
                 inf_img, data = self.queue.get()
-                if (self._stopped):
+                if self._stopped:
                     continue
                 # Convert an image from BGR to RGB
                 frame = Image.fromarray(inf_img)
                 buffer = BytesIO()
                 frame.save(buffer, format="JPEG", quality=general_cfg["quality_post_image"])
+                buffer.seek(0)  # Важно, иначе отправка может быть пустой
+
                 try:
-                    await session.post(
-                        url = self.url_frame,
-                        data = buffer.getvalue(),
+                    form = aiohttp.FormData()
+                    form.add_field("file", buffer.getvalue(), filename="frame.jpg", content_type="image/jpeg")
+
+                    response = await session.post(
+                        url=self.url_frame,
+                        data=form,
                         timeout=2
                     )
+
+                    if response.status != 200:
+                        self.logger.error(f"Error sending frame: {response.status}")
+
                     await session.post(
-                        url = self.url_data,
-                        json = data,
+                        url=self.url_data,
+                        json=data,
                         timeout=2
                     )
-                except Exception:
-                    self.stop() # ?
+                except Exception as e:
+                    self.logger.error(f"Request error: {e}")
+                    self.stop()
             self._stop_event.wait(1)
 
     def startup(self) -> None:

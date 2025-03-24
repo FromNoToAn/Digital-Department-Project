@@ -401,27 +401,6 @@ class Base(ABC):
                                         track[5],
                                     ]
                                 )
-                    case "botsort":
-                        tracks = self.trackers[task_id].update(
-                            np.hstack((boxes,
-                                       scores.reshape(-1,1),
-                                       classes.reshape(-1,1))),
-                            img
-                            )
-                        if len(tracks):
-                            for track in tracks:
-                                x0, y0, x1, y1 = map(int, track[0:4])
-                                dets.append(
-                                    [
-                                        x0,
-                                        y0,
-                                        x1,
-                                        y1,
-                                        int(track[4]),  # Track ID
-                                        int(track[6]),  # Class ID
-                                        float(track[5]),# Confidence
-                                    ]
-                                )
         return dets
 
     @staticmethod
@@ -648,6 +627,7 @@ class Base(ABC):
             url_data=f"http://{self.task_params[task_id].host_ip}:{general_cfg['manager_port']}/task/data/{task_id}",
             logger=self.logger,
         )
+        
         # Start session
         if params.is_realtime:
             session.start()
@@ -789,23 +769,15 @@ class Base(ABC):
         match general_cfg["tracker"]:
             case "sfsort":
                 self.trackers[task_id] = SFSORT.SFSORT(general_cfg["tracker_args_sfsort"])
-            case "botsort":
-                from boxmot import BotSort
-                self.trackers[task_id] = BotSort(
-                    frame_rate=general_cfg["framerate"],
-                    **general_cfg["tracker_args_botsort"])
         
         self.timestamps[task_id] = queue.Queue()
 
         self.data_loggers[task_id] = self.YOLODataLogger(task_id)
         
-        # print("lol")
-        lol = StatusTask.RUNNING
-        # print(task_id)
-        # print("lol-")
         self.task_params[task_id] = TaskParameters(host_ip=general_cfg['manager_host'])
         self.task_params[task_id].inference_status = StatusTask.RUNNING
         success = True
+        
         # inferencing
         try:
             results = self._inference_cycle(video_url, task_id, properties)
