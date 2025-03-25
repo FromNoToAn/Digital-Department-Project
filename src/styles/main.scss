@@ -198,6 +198,8 @@
 
       &.for_video
       {
+        position: relative;
+        display: flex;
         align-items: center;
         justify-content: center;
       }
@@ -210,7 +212,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        padding: 0 0 calc(var(--border-size)) calc(var(--border-size));
+        // padding: 0 0 calc(var(--border-size)) calc(var(--border-size));
         border-radius: calc(var(--border-radius) / 2);
         background-image: linear-gradient(90deg, var(--color-light_lime), var(--color-lime), var(--color-dark));
 
@@ -219,7 +221,10 @@
         {
           width: 100%;
           aspect-ratio: 16/9;
+          border: calc(var(--border-size)) solid var(--color-lime);
+          border-width: calc(var(--border-size)) 0 0 calc(var(--border-size));
           border-radius: calc(var(--border-radius) / 2.5);
+          background-color: var(--color-dark);
         }
 
         .progress_img
