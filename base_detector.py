@@ -8,11 +8,14 @@ import shutil
 import json
 import aiohttp
 
-from fastapi import UploadFile, File, Form
+from fastapi import Request, UploadFile, File, Form, Body, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
+
+from typing import Optional, Dict, Any, Union
+from pydantic import BaseModel
 
 from detector import Detector
 
@@ -73,38 +76,99 @@ class BaseDetector(Detector):
         return task_id
 
 
-    async def upload_video(self, video: UploadFile = File(...), is_realtime: bool = Form(False)):
+    async def upload_video(
+        self,
+        video: Optional[UploadFile] = File(None),
+        is_realtime: Optional[bool] = Form(None),
+        json_data: Optional[str] = Form(None),
+        request: Request = None,
+    ):
         """
-        Принимает видео и отправляет его на эндпоинт обработки без сохранения на диск.
+        Accepts a video (file or JSON with RTSP URL) and sends it for processing.
         """
         task_id = self.get_free_task_id()
-        
-        properties = {
-        "isRealtime": str(is_realtime),
-        # "cornerUp": 0,
-        # "cornerLeft": 0,
-        # "cornerBottom": 1080,
-        # "cornerRight": 1920
-        }
-        
-        self.logger.info(f"is_realtime: {is_realtime}")
-        
-        async with aiohttp.ClientSession() as session:
-            form_data = aiohttp.FormData()
-            video_bytes = await video.read()
-            
-            form_data.add_field("file", video_bytes, filename=video.filename, content_type=video.content_type)
-            form_data.add_field("properties", json.dumps(properties), content_type="text/plain")
-            
-            response = await session.post(f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}", data=form_data)
 
-            if response.status != 200:
-                return JSONResponse(content={"message": "Error sending video", "status": response.status}, status_code=500)
+        # If Content-Type = application/json, parse the request body
+        if request.headers.get("Content-Type") == "application/json":
+            try:
+                json_body = await request.json()
+                data = json_body  # Already parsed JSON
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Invalid JSON: {str(e)}")
+
+        # If JSON is passed via FormData (e.g., from the frontend)
+        elif json_data:
+            try:
+                data = json.loads(json_data)
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid JSON")
+
+        # If a video file is passed
+        elif video:
+            data = {
+                "file": await video.read(),
+                "properties": {"isRealtime": is_realtime} if is_realtime else {}
+            }
+        else:
+            raise HTTPException(status_code=400, detail="You must provide either a video or JSON")
+
+        # Sending data to the internal API
+        async with aiohttp.ClientSession() as session:
+            if "cameraUrls" in data:            # This is a JSON with RTSP URL
+                response = await session.post(
+                    f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}",
+                    json=data,
+                )
+            else:                               # This is a video file
+                form_data = aiohttp.FormData()
+                form_data.add_field("file", data["file"], filename=video.filename)
+                form_data.add_field("properties", json.dumps(data["properties"]))
+                response = await session.post(
+                    f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}",
+                    data=form_data,
+                )
+
+        if response.status != 200:
+            return JSONResponse(content={"message": "Error sending video", "status": response.status}, status_code=500)
 
         return JSONResponse(content={
             "message": "Video uploaded and sent for processing",
             "task_id": task_id
         })
+
+    # OLD upload_video ПУСТЬ ПОКА ЧТО ПОЛЕЖИТ!
+    # async def upload_video(self, video: UploadFile = File(...), is_realtime: bool = Form(False)):
+    #     """
+    #     Принимает видео и отправляет его на эндпоинт обработки без сохранения на диск.
+    #     """
+    #     task_id = self.get_free_task_id()
+        
+    #     properties = {
+    #     "isRealtime": str(is_realtime),
+    #     # "cornerUp": 0,
+    #     # "cornerLeft": 0,
+    #     # "cornerBottom": 1080,
+    #     # "cornerRight": 1920
+    #     }
+        
+    #     self.logger.info(f"is_realtime: {is_realtime}")
+        
+    #     async with aiohttp.ClientSession() as session:
+    #         form_data = aiohttp.FormData()
+    #         video_bytes = await video.read()
+            
+    #         form_data.add_field("file", video_bytes, filename=video.filename, content_type=video.content_type)
+    #         form_data.add_field("properties", json.dumps(properties), content_type="text/plain")
+            
+    #         response = await session.post(f"http://{general_cfg['manager_host']}:{general_cfg['manager_port']}/api/inference/{task_id}", data=form_data)
+
+    #         if response.status != 200:
+    #             return JSONResponse(content={"message": "Error sending video", "status": response.status}, status_code=500)
+
+    #     return JSONResponse(content={
+    #         "message": "Video uploaded and sent for processing",
+    #         "task_id": task_id
+    #     })
 
 
     async def get_status_task(self, task_id: int):

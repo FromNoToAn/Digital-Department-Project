@@ -99,7 +99,7 @@ def create_router(
             # Input and processing properties
             data: dict = await request.json()
             properties = get_properties(data=data.get("properties", {}))
-            video_url = data["cameraUrls"][0]["video"]
+            video_url = data["cameraUrls"]["video_url"]
         if task_id in task_params:
             if not task_params[task_id].inference_status >= 2:
                 logger.warning(
