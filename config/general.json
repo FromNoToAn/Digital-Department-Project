@@ -17,11 +17,11 @@
         "match_th_first_m": 0.05,
         "match_th_second": 0.4,
         "new_track_th_m": 0.2,
-        "marginal_timeout": 84.0,
-        "central_timeout": 120.0,
-        "horizontal_margin": 72,
-        "vertical_margin": 48,
-        "frame_width": 720,
-        "frame_height": 480
+        "marginal_timeout": 35.0,
+        "central_timeout": 50.0,
+        "horizontal_margin": 192,
+        "vertical_margin": 108,
+        "frame_width": 1920,
+        "frame_height": 1080
     }
 }

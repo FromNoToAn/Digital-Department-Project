@@ -37,6 +37,33 @@ from utils.validate import validate_unix_timestamp
 
 list_of_animals = ["Медведь","Птица","Кот","Олень","Собака","Обезьяна","Тигр","Кабан"]
 
+import numpy as np
+from scipy.interpolate import splprep, splev
+
+def smooth_spline(points, window_size=general_cfg['framerate']//2):
+    if len(points) < window_size:
+        return points
+
+    points = np.array(points)
+    
+    # Проверка на корректные входные данные
+    if points.ndim != 2 or points.shape[1] != 2:
+        raise ValueError("points should be an array of shape (n, 2)")
+    
+    smoothed_points = []
+    for i in range(len(points)):
+        # Определяем границы окна
+        start = max(0, i - window_size // 2)  # Начало окна
+        end = min(len(points), i + window_size // 2 + 1)  # Конец окна
+        
+        # Вычисляем средние значения
+        avg = np.mean(points[start:end], axis=0)
+        smoothed_points.append(avg.tolist())
+
+    return smoothed_points
+
+
+
 class Base(ABC):
     """
     Core of the Base Detector.
@@ -274,8 +301,13 @@ class Base(ABC):
                 color=(235, 215, 50),
                 thickness=3,
             )
+            det[8] = smooth_spline(det[8])
+            # # Рисуем линии
+            # print(det[8])
             for i in range(1, len(det[8])):
-                cv2.line(inf_img, det[8][i - 1], det[8][i], (0, 255, 0), 2)
+                pt1 = (int(det[8][i - 1][0]), int(det[8][i - 1][1]))  # Преобразуем в целые числа
+                pt2 = (int(det[8][i][0]), int(det[8][i][1]))          # Преобразуем в целые числа
+                cv2.line(inf_img, pt1, pt2, (0, 255, 0), 2)
             cv2.putText(
                 img=inf_img,
                 text=f"{det[4]}, {list_of_animals[det[5]]}, {det[6]:.2f}, {det[7]:.2f}",
