@@ -9,6 +9,7 @@ import os
 import queue
 import re
 import sys
+import glob
 import time
 import json
 from collections import defaultdict
@@ -321,6 +322,61 @@ class Base(ABC):
             )
 
         return inf_img
+    
+    def save_detected_objects(self, frame: np.ndarray, detections: list, output_dir: str = "detected_objects") -> None:
+        """
+        Сохраняет обнаруженные объекты раз в 5 секунд в формате: id_class_conf_time.png
+        Очищает папку только от старых версий тех же объектов
+        
+        Args:
+            frame (np.ndarray): Исходный кадр с детекциями
+            detections (list): Список детекций [x0,y0,x1,y1,track_id,class_id,score,time,path]
+            output_dir (str): Директория для сохранения скриншотов
+        """
+        os.makedirs(output_dir, exist_ok=True)
+        current_time = time.time()
+        saved_files = []
+
+        for det in detections:
+            x0, y0, x1, y1 = map(int, det[:4])
+            track_id = int(det[4])
+            class_id = int(det[5])
+            confidence = float(det[6])
+            detection_time = float(det[7])
+            
+            # Проверяем интервал 5 секунд
+            last_save_key = f"last_save_{track_id}"
+            if hasattr(self, last_save_key):
+                if current_time - getattr(self, last_save_key) < 5:
+                    continue
+            
+            class_name = list_of_animals[class_id] if class_id < len(list_of_animals) else str(class_id)
+            filename = f"{track_id}_{class_name}_{confidence:.2f}_{detection_time:.2f}.png"
+            save_path = os.path.join(output_dir, filename)
+            
+            # Удаляем только старые версии этого же объекта
+            pattern = os.path.join(output_dir, f"{track_id}_{class_name}_*.png")
+            for old_file in glob.glob(pattern):
+                if old_file != save_path:  # Не удаляем текущий файл
+                    try:
+                        os.remove(old_file)
+                    except Exception as e:
+                        self.logger.error(f"Error deleting old file {old_file}: {e}")
+            
+            # Сохраняем новый скриншот
+            object_img = frame[y0:y1, x0:x1]
+            if object_img.size > 0:
+                try:
+                    cv2.imwrite(save_path, object_img)
+                    setattr(self, last_save_key, current_time)
+                    saved_files.append(filename)
+                    self.logger.debug(f"Saved object: {filename}")
+                except Exception as e:
+                    self.logger.error(f"Error saving object image {filename}: {e}")
+        
+        # Логируем итоговый список сохраненных файлов
+        if saved_files:
+            self.logger.info(f"Saved objects this batch: {', '.join(saved_files)}")
 
     def _get_timestamp(self, process: Popen, task_id: str) -> None:
         """
@@ -693,6 +749,7 @@ class Base(ABC):
 
             # Get results
             result = self.run(frame, task_id)
+            self.save_detected_objects(frame, result)
             self.data_loggers[task_id].update_json()
             converted_dets = []
             for det in result:

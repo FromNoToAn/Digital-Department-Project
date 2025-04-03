@@ -6,6 +6,7 @@
     "working_time_sec": 30,
     "tracker": "sfsort",
     "trail_length": 100,
+    "group_threshold": 5,
     "tracker_args_sfsort": {
         "high_th": 0.3,
         "match_th_first": 0.8,
