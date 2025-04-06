@@ -75,6 +75,7 @@ class Base(ABC):
             self.lock = threading.Lock()
             self.time = 0
             self.task_id = task_id
+            self.group_threshold = general_cfg.get("group_threshold", 3)
             
             # Запускаем периодическое обновление JSON
             self.timer = threading.Timer(5.0, self.update_json)
@@ -123,7 +124,8 @@ class Base(ABC):
             """Формирует данные для сохранения в JSON."""
             data = {
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "objects": []
+                "objects": [],
+                "is_group": False
             }
             
             with self.lock:
@@ -133,6 +135,9 @@ class Base(ABC):
                         "bbox": obj['bbox'],
                         "duration": obj['time']
                     })
+                
+                num_objects = len(data["objects"])
+                data["is_group"] = num_objects >= self.group_threshold
             
             return data
 
@@ -351,7 +356,10 @@ class Base(ABC):
                     continue
             
             class_name = list_of_animals[class_id] if class_id < len(list_of_animals) else str(class_id)
-            filename = f"{track_id}_{class_name}_{confidence:.2f}_{detection_time:.2f}.png"
+            if len(detections) >= general_cfg["group_threshold"]:
+                filename = f"{track_id}_{class_name}_{confidence:.2f}_{detection_time:.2f}_gr1.png"
+            else:
+                filename = f"{track_id}_{class_name}_{confidence:.2f}_{detection_time:.2f}_gr0.png"
             save_path = os.path.join(output_dir, filename)
             
             # Удаляем только старые версии этого же объекта
