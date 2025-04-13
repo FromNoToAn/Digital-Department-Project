@@ -260,7 +260,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   {
     "stream": true,
     "message": "Stream file found/Stream has ended/Stream file not found",
-    "file_url": "http://{host}:{port}/videos/{task_id}.jpg" // только если stream=true
+    "file_url": "http://{host}:{port}/videos/{task_id}.jpg"
   }
   ```
   file_url существует, только если "stream": true
@@ -317,7 +317,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   ```json
   {
     "message": "Task results saved",
-    "task_id": task_id,
+    "task_id": "task_id",
     "results_path": "results/task_{task_id}_results.json"
   }
   ```
