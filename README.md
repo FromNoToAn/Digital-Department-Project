@@ -1,7 +1,7 @@
 # API DEVELOPMENT
 IIR NSU 2025, 3rd year, 22931-32 group members
 
-# Документация по системе обнаружения целевых объектов (ядро/базовая версия)
+# Документация по системе обнаружения животных
 
 ## Содержание
 
@@ -233,7 +233,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
     ```json
     {
       "message": "Error sending video",
-      "status": status_code
+      "status": "status_code"
     }
     ```
 
@@ -258,11 +258,12 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Response:**
   ```json
   {
-    "stream": true/false,
+    "stream": true,
     "message": "Stream file found/Stream has ended/Stream file not found",
     "file_url": "http://{host}:{port}/videos/{task_id}.jpg" // только если stream=true
   }
   ```
+  file_url существует, только если "stream": true
 
 ##### 7.1.3. Управление данными задачи
 
@@ -272,15 +273,15 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Body:**
   ```json
   {
-    // Любые данные задачи в формате JSON
+    "Любые данные задачи в формате JSON"
   }
   ```
 - **Response:**
   ```json
   {
     "message": "Task data processed",
-    "task_id": task_id,
-    "data": task_data
+    "task_id": "task_id",
+    "data": "task_data"
   }
   ```
 
@@ -290,7 +291,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Response:**
   ```json
   {
-    // Данные задачи в формате JSON
+    "Данные задачи в формате JSON"
   }
   ```
 - **Errors:**
@@ -309,7 +310,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Body:**
   ```json
   {
-    // Результаты выполнения задачи в формате JSON
+    "Результаты выполнения задачи в формате JSON"
   }
   ```
 - **Response:**
@@ -336,7 +337,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
         "video_url": "rtsp://10.4.88.103:8554/example"
       },
       "properties": {
-        "isRealtime": False,
+        "isRealtime": false,
         "corners": {
           "cornerUp": 0,
           "cornerLeft": 0,
@@ -397,7 +398,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   {
     "task_id": 1,
     "state": 1,
-    "success": True,
+    "success": true,
     "start": 1733991698870,
     "framesProcessed": 0,
     "progress": 0.0,
@@ -409,7 +410,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
     ```json
     {
       "task_id": 1,
-      "success": False,
+      "success": false,
       "state": 1
     }
     ```
@@ -422,7 +423,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   {
     "task_id": 1,
     "state": 1,
-    "success": True,
+    "success": true,
     "framesProcessed": 10,
     "progress": 0.35,
     "tsLastFrame": 1733992819310
@@ -444,7 +445,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   {
     "task_id": 1,
     "state": 2,
-    "success": True,
+    "success": true,
     "start": 1733991698870,
     "framesProcessed": 72,
     "tsLastFrame": 1733993061077
