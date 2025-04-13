@@ -271,7 +271,8 @@ IIR NSU 2025, 3rd year, 22931-32 group members
     "success": true,
     "framesProcessed": "frames_processed",
     "progress": "progress",
-    "tsLastFrame": "timestamp"
+    "tsLastFrame": "timestamp",
+    "mp4": false
   }
   ```
   - **Примечание:**
@@ -286,6 +287,26 @@ IIR NSU 2025, 3rd year, 22931-32 group members
     - **framesProcessed** является количеством уже обработанных кадров
     - **progress** является прогрессом выполнения задачи в диапазоне от 0 до 1
     - **tsLastFrame** является UNIX like временем (в миллисекундах) последнего обработанного кадра
+    - **mp4** является флагом, указывающим на то, что статус был получен из файла результатов (true) или через API (false). При этом обработанное видео уже доступно для просмотра.
+    
+- **Errors:**
+  - **404 - задача не найдена**
+    ```json
+    {
+      "task_id": "task_id",
+      "success": false,
+      "mp4": false,
+      "message": "Task {task_id} not found or error occurred (Status code: {status_code})"
+    }
+    ```
+  - **500 - внутренняя ошибка сервера**
+    ```json
+    {
+      "task_id": "task_id",
+      "success": false,
+      "message": "Error occurred: {error_message}"
+    }
+    ```
 
 ###### 7.1.2.2. Остановка задачи
 - **Method:** DELETE
