@@ -266,12 +266,12 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Response:**
   ```json
   {
-    "task_id": task_id,
-    "state": state,
+    "task_id": "task_id",
+    "state": "state",
     "success": true,
-    "framesProcessed": frames_processed,
-    "progress": progress,
-    "tsLastFrame": timestamp
+    "framesProcessed": "frames_processed",
+    "progress": "progress",
+    "tsLastFrame": "timestamp"
   }
   ```
   - **Примечание:**
@@ -293,7 +293,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
 - **Response:**
   ```json
   {
-    "task_id": task_id,
+    "task_id": "task_id",
     "message": "Task status and task deleted successfully"
   }
   ```
@@ -301,7 +301,7 @@ IIR NSU 2025, 3rd year, 22931-32 group members
   - **500 - ошибка при удалении задачи**
     ```json
     {
-      "task_id": task_id,
+      "task_id": "task_id",
       "message": "Error occurred while trying to delete task: {error_message}"
     }
     ```
