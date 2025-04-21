@@ -29,6 +29,11 @@ curl -X POST "http://localhost:8000/upload_video" ^
 -H "Content-Type: application/json" ^
 -d "{\"cameraUrls\": {\"video_url\": \"rtsp://ссылка_на_поток\"}, \"properties\": {\"isRealtime\": false, \"corners\": {\"cornerUp\": 0, \"cornerLeft\": 0, \"cornerBottom\": 1080, \"cornerRight\": 1920}}}"
 
+Linux
+curl -X POST "http://localhost:8000/upload_video" \
+-H "Content-Type: application/json" \
+-d "{\"cameraUrls\": {\"video_url\": \"rtsp://ссылка_на_поток\"}, \"properties\": {\"isRealtime\": false, \"corners\": {\"cornerUp\": 0, \"cornerLeft\": 0, \"cornerBottom\": 1080, \"cornerRight\": 1920}}}"
+
 Если необходимо узнать статус обработки:
 curl -X GET "http://localhost:8000/task/status/id"
 
