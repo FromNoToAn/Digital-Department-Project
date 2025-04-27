@@ -101,7 +101,7 @@ class RK3588_v2(RK3588):
         return boxes, classes, scores
 
 
-model_name = "yolov8s.rknn"
+model_name = "best.rknn"
 model_path = os.path.join(os.path.dirname(__file__), "models", model_name)
 source = 0
 

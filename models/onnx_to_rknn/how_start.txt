@@ -1,0 +1,3 @@
+Из папки с этим файлом:
+
+python3 convert.py best.onnx rk3588 i8 best.rknn
